@@ -72,7 +72,7 @@ export const releases: Release[] = [
     blurb:
       "A drop-in proxy that sits between an AI agent and its tools, and refuses the actions it was tricked into taking.",
     brief:
-      "Anything an agent reads can carry instructions aimed at the agent. tripwire watches the gap between what the user asked for and what the agent is about to do. Built with teammates in two days at CalHacks.",
+      "Anything an agent reads can carry instructions aimed at the agent. tripwire sits between the agent and its tools and blocks actions the user never asked for. Built with teammates in two days at CalHacks.",
     notes: [
       "Agents that can use tools can be talked into using them badly. A web page, an email, or a file an agent reads can carry instructions aimed at the agent rather than the user, and from the model's side, retrieved text and genuine instructions look alike.",
       "tripwire sits in front of the Model Context Protocol as a proxy, so it needs no change to the agent or the tools. It watches the gap between what the user asked for and what the agent is about to do, and blocks actions that only make sense if something in the content was giving orders.",
@@ -91,9 +91,9 @@ export const releases: Release[] = [
     blurb:
       "A fault-tolerant evaluation platform for language models, built to remove the biases that make model comparisons lie.",
     brief:
-      "Model judges favour the first answer they see, longer answers, and their own family's writing. double-blind hides identities and counterbalances order. A failed node loses one judgement, not the run.",
+      "LLM judges change their verdict when they know who wrote what. double-blind hides model identity, randomizes answer order, and measures how far the verdict shifts when blinding is off. Kill a worker mid-run and its task is reassigned within 30 seconds, with no double-writes.",
     notes: [
-      "Using a language model to judge other models is standard practice and quietly unreliable. Judges favour whichever answer they saw first, prefer longer responses, and recognise their own family's writing. An evaluation that ignores this produces confident numbers that mean very little.",
+      "Using a language model to judge other models is standard practice and quietly unreliable. Judges favour whichever answer they saw first, prefer longer responses, and recognise their own writing. An evaluation that ignores this produces confident numbers that mean very little.",
       "double-blind runs evaluations with the conditions that cause those effects controlled (identities hidden, order randomised and counterbalanced), and distributes the work so a failed node loses one judgement rather than the whole run.",
       "Written in Rust, and the longest-running thing here: two and a half months of steady work rather than a sprint.",
     ],
@@ -113,7 +113,7 @@ export const releases: Release[] = [
     blurb:
       "A terminal visualizer for sorting and pathfinding you can scrub backwards through, one comparison at a time.",
     brief:
-      "Each algorithm runs to completion and records a reversible event log. Rendering is a pure function of trace and cursor, so stepping back is arithmetic. Published on crates.io.",
+      "Each algorithm runs once and records every step in a reversible log. The screen is drawn purely from that log and a cursor, so stepping backward costs the same as stepping forward. Published on crates.io.",
     notes: [
       "The hard part of an algorithm visualizer is not the algorithms, it is the animation state. The obvious design has each algorithm pause itself mid-run, which reads naturally and is a dead end: the algorithm owns control flow, so pausing means parking a thread and stepping backwards is impossible.",
       "So nothing here animates itself. Each algorithm runs to completion immediately and records its operations into a reversible event log. Rendering becomes a pure function of (trace, cursor), and stepping back, scrubbing and reverse playback all collapse into cursor arithmetic. The invariant that buys it: every step carries enough information to undo itself. Property tests assert that applying every step forward and then backward returns bit-for-bit to the start.",
@@ -136,7 +136,7 @@ export const releases: Release[] = [
     blurb:
       "An on-call agent for AWS that investigates an alert, finds the root cause, proposes a fix, and writes the post-mortem.",
     brief:
-      "It walks an alert from investigation to root cause to fix. Every step shows its reasoning. The post-mortem is drafted from what it actually did.",
+      "When an alarm fires, cloudscape correlates CloudWatch metrics, logs, and CloudTrail events to rank probable root causes and draft remediation steps. It investigates other AWS accounts through short-lived assumed roles, with no stored credentials. Co-built, and won a Perplexity-partnered hackathon.",
     notes: [
       "On-call work is mostly retrieval under time pressure: pull the metrics, read the logs, check what deployed, form a theory, test it. That shape suits an agent, as long as it shows its reasoning rather than asserting an answer.",
       "cloudscape walks an alert through investigation to root cause to remediation, then drafts the post-mortem from what it actually did, so the write-up matches the investigation instead of being reconstructed afterwards.",
