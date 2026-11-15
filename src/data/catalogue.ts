@@ -25,6 +25,7 @@ export type Release = {
   when: string;
   /** One line, shown collapsed. Has to carry the project on its own. */
   blurb: string;
+  brief: string;
   /** The expanded liner notes. Each string is a paragraph. */
   notes: string[];
   links: Link[];
@@ -70,6 +71,8 @@ export const releases: Release[] = [
     tag: "CalHacks 2026",
     blurb:
       "A drop-in proxy that sits between an AI agent and its tools, and refuses the actions it was tricked into taking.",
+    brief:
+      "Anything an agent reads can carry instructions aimed at the agent. tripwire watches the gap between what the user asked for and what the agent is about to do. Built in two days at CalHacks.",
     notes: [
       "Agents that can use tools can be talked into using them badly. A web page, an email, or a file an agent reads can carry instructions aimed at the agent rather than the user, and from the model's side, retrieved text and genuine instructions look alike.",
       "tripwire sits in front of the Model Context Protocol as a proxy, so it needs no change to the agent or the tools. It watches the gap between what the user asked for and what the agent is about to do, and blocks actions that only make sense if something in the content was giving orders.",
@@ -87,6 +90,8 @@ export const releases: Release[] = [
     when: "Aug to Nov 2026",
     blurb:
       "A fault-tolerant evaluation platform for language models, built to remove the biases that make model comparisons lie.",
+    brief:
+      "Model judges favour the first answer they see, longer answers, and their own family's writing. double-blind hides identities and counterbalances order. A failed node loses one judgement, not the run.",
     notes: [
       "Using a language model to judge other models is standard practice and quietly unreliable. Judges favour whichever answer they saw first, prefer longer responses, and recognise their own family's writing. An evaluation that ignores this produces confident numbers that mean very little.",
       "double-blind runs evaluations with the conditions that cause those effects controlled (identities hidden, order randomised and counterbalanced), and distributes the work so a failed node loses one judgement rather than the whole run.",
@@ -107,6 +112,8 @@ export const releases: Release[] = [
     tag: "on crates.io",
     blurb:
       "A terminal visualizer for sorting and pathfinding you can scrub backwards through, one comparison at a time.",
+    brief:
+      "Each algorithm runs to completion and records a reversible event log. Rendering is a pure function of trace and cursor, so stepping back is arithmetic. Published on crates.io.",
     notes: [
       "The hard part of an algorithm visualizer is not the algorithms, it is the animation state. The obvious design has each algorithm pause itself mid-run, which reads naturally and is a dead end: the algorithm owns control flow, so pausing means parking a thread and stepping backwards is impossible.",
       "So nothing here animates itself. Each algorithm runs to completion immediately and records its operations into a reversible event log. Rendering becomes a pure function of (trace, cursor), and stepping back, scrubbing and reverse playback all collapse into cursor arithmetic. The invariant that buys it: every step carries enough information to undo itself. Property tests assert that applying every step forward and then backward returns bit-for-bit to the start.",
@@ -122,6 +129,29 @@ export const releases: Release[] = [
   },
   {
     n: 4,
+    title: "cloudscape",
+    repo: "cloudscape",
+    stack: ["TypeScript", "AWS"],
+    when: "Apr 2026",
+    blurb:
+      "An on-call agent for AWS that investigates an alert, finds the root cause, proposes a fix, and writes the post-mortem.",
+    brief:
+      "It walks an alert from investigation to root cause to fix. Every step shows its reasoning. The post-mortem is drafted from what it actually did.",
+    notes: [
+      "On-call work is mostly retrieval under time pressure: pull the metrics, read the logs, check what deployed, form a theory, test it. That shape suits an agent, as long as it shows its reasoning rather than asserting an answer.",
+      "cloudscape walks an alert through investigation to root cause to remediation, then drafts the post-mortem from what it actually did, so the write-up matches the investigation instead of being reconstructed afterwards.",
+    ],
+    links: [
+      { label: "Source", href: "https://github.com/anikag35/cloudscape" },
+    ],
+    clip: null,
+    poster: null,
+  },
+];
+
+export const shelved: Release[] = [
+  {
+    n: 5,
     title: "gepa-polyglot",
     repo: "gepa-polyglot",
     stack: ["Python", "gRPC", "Rust", "TypeScript"],
@@ -129,6 +159,8 @@ export const releases: Release[] = [
     tag: "Sky Computing Lab",
     blurb:
       "A bidirectional gRPC bridge that lets prompt optimization run from TypeScript or Rust while the evaluators stay native.",
+    brief:
+      "GEPA's research lives in Python. The systems people want to optimize usually do not. This bridge drives it from TypeScript or Rust while evaluation stays native.",
     notes: [
       "GEPA optimizes prompts by reflecting on how they failed. The research lives in Python; the systems people want to optimize usually do not.",
       "This is the interface between them: a bidirectional gRPC service that drives optimization from TypeScript or Rust, with evaluation staying in whichever language the system under test is written in. No reimplementing your evaluator in Python to use the optimizer.",
@@ -137,24 +169,6 @@ export const releases: Release[] = [
     links: [
       { label: "Source", href: "https://github.com/anikag35/gepa-polyglot" },
       { label: "GEPA", href: "https://github.com/gepa-ai/gepa" },
-    ],
-    clip: null,
-    poster: null,
-  },
-  {
-    n: 5,
-    title: "cloudscape",
-    repo: "cloudscape",
-    stack: ["TypeScript", "AWS"],
-    when: "Apr 2026",
-    blurb:
-      "An on-call agent for AWS that investigates an alert, finds the root cause, proposes a fix, and writes the post-mortem.",
-    notes: [
-      "On-call work is mostly retrieval under time pressure: pull the metrics, read the logs, check what deployed, form a theory, test it. That shape suits an agent, as long as it shows its reasoning rather than asserting an answer.",
-      "cloudscape walks an alert through investigation to root cause to remediation, then drafts the post-mortem from what it actually did, so the write-up matches the investigation instead of being reconstructed afterwards.",
-    ],
-    links: [
-      { label: "Source", href: "https://github.com/anikag35/cloudscape" },
     ],
     clip: null,
     poster: null,

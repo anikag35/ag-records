@@ -90,8 +90,7 @@ export function mount(root: HTMLElement): void {
     weight: token("--display-weight") || "400",
   };
 
-  const word = root.querySelector<HTMLElement>("[data-word]");
-  const wordbox = word?.parentElement ?? null;
+  const word = root.querySelector<HTMLCanvasElement>("[data-word]");
   const catalogs = Array.from(root.querySelectorAll<HTMLElement>("[data-catalog]"));
   const tag = root.querySelector<HTMLElement>("[data-tag]");
   const home = {
@@ -100,7 +99,12 @@ export function mount(root: HTMLElement): void {
     tag: root.dataset.homeTag ?? "",
   };
 
-  const wide = window.matchMedia("(min-width: 56.01rem)");
+  const stacked = window.matchMedia("(max-width: 49.99rem), (max-aspect-ratio: 1/1)");
+  const wide = {
+    get matches() {
+      return !stacked.matches;
+    },
+  };
   const width = (GROOVE_OUT - GROOVE_IN - GAP * (count - 1)) / count;
   const outerOf = (i: number) => GROOVE_OUT - i * (width + GAP);
   const innerOf = (i: number) => outerOf(i) - width;
@@ -413,14 +417,19 @@ export function mount(root: HTMLElement): void {
     ctx!.arc(px, py, R * 0.04, 0, Math.PI * 2);
     ctx!.fill();
 
+    const dot = Math.max(4, R * 0.024);
+    ctx!.fillStyle = colors.paper;
+    ctx!.beginPath();
+    ctx!.arc(sx, sy, dot * 1.45, 0, Math.PI * 2);
+    ctx!.fill();
     ctx!.fillStyle = colors.accent;
     ctx!.beginPath();
-    ctx!.arc(sx, sy, Math.max(1.5, R * 0.008), 0, Math.PI * 2);
+    ctx!.arc(sx, sy, dot, 0, Math.PI * 2);
     ctx!.fill();
   }
 
-  function draw(): void {
-    if (!geo || !disc || !bright || !labelArt || !under) return;
+  function draw(): boolean {
+    if (!geo || !disc || !bright || !labelArt || !under) return false;
     const { dpr, R, cx, cy } = geo;
     ctx!.setTransform(1, 0, 0, 1, 0, 0);
     ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
@@ -466,27 +475,71 @@ export function mount(root: HTMLElement): void {
     ctx!.restore();
 
     drawArm(geo);
+    return true;
   }
 
-  function fitWord(): void {
-    if (!word || !wordbox) return;
-    const probe = document.createElement("canvas").getContext("2d")!;
-    probe.font = `${fonts.weight} 100px ${fonts.display}`;
-    const m = probe.measureText("H");
-    const cap = m.actualBoundingBoxAscent / 100;
-    const leading = (2 * m.actualBoundingBoxAscent - m.fontBoundingBoxAscent + m.fontBoundingBoxDescent) / 100;
-    const avail = wordbox.clientWidth;
-    const tallest = Math.min(window.innerHeight * 0.155, avail * 0.098);
-    const shortest = tallest * 0.8;
-    word.style.transform = "none";
-    word.style.lineHeight = String(leading);
-    word.style.fontSize = "100px";
-    const natural = word.getBoundingClientRect().width;
-    const height = clamp((100 * avail * cap) / natural, shortest, tallest);
-    const size = height / cap;
-    word.style.fontSize = `${size}px`;
-    word.style.transform = `scaleX(${avail / ((natural * size) / 100)})`;
-    root.style.setProperty("--word-h", `${tallest}px`);
+  let speck: HTMLCanvasElement | null = null;
+
+  function speckle(): HTMLCanvasElement {
+    if (speck) return speck;
+    speck = document.createElement("canvas");
+    speck.width = speck.height = 192;
+    const g = speck.getContext("2d")!;
+    const random = rng(77);
+    g.fillStyle = colors.paper;
+    for (let i = 0; i < 1500; i++) {
+      g.globalAlpha = 0.35 + random() * 0.6;
+      const s = random() < 0.85 ? 1 : 2;
+      g.fillRect(Math.floor(random() * 192), Math.floor(random() * 192), s, s);
+    }
+    return speck;
+  }
+
+  function drawWord(): void {
+    if (!word) return;
+    const spec = `${fonts.weight} 200px ${fonts.display}`;
+    if (document.fonts && !document.fonts.check(spec)) return;
+    const box = word.getBoundingClientRect();
+    if (box.width < 1 || box.height < 1) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const W = Math.round(box.width * dpr);
+    const H = Math.round(box.height * dpr);
+    word.width = W;
+    word.height = H;
+    const g = word.getContext("2d")!;
+    const band = index >= 0 ? bands[index] : null;
+    const text = (band ? band.title : home.word).toUpperCase();
+
+    g.font = spec;
+    const m = g.measureText(text);
+    const inkW = m.actualBoundingBoxLeft + m.actualBoundingBoxRight;
+    const inkH = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
+    if (inkW < 1 || inkH < 1) return;
+    g.save();
+    g.scale(W / inkW, H / inkH);
+    g.fillStyle = colors.ink;
+    g.textBaseline = "alphabetic";
+    g.fillText(text, m.actualBoundingBoxLeft, m.actualBoundingBoxAscent);
+    g.restore();
+
+    g.globalCompositeOperation = "source-atop";
+    const pattern = g.createPattern(speckle(), "repeat");
+    if (pattern) {
+      g.fillStyle = pattern;
+      g.fillRect(0, 0, W, H);
+    }
+    const random = rng(hash(text));
+    for (let i = 0; i < 7; i++) {
+      const x = random() * W;
+      const y = random() * H;
+      const r = H * (0.5 + random() * 0.9);
+      const wear = g.createRadialGradient(x, y, 0, x, y, r);
+      wear.addColorStop(0, "rgb(236 236 234 / 0.2)");
+      wear.addColorStop(1, "rgb(236 236 234 / 0)");
+      g.fillStyle = wear;
+      g.fillRect(0, 0, W, H);
+    }
+    g.globalCompositeOperation = "source-over";
   }
 
   function describe(): void {
@@ -496,8 +549,7 @@ export function mount(root: HTMLElement): void {
     });
     if (tag) tag.textContent = band ? band.when : home.tag;
     if (word) {
-      word.textContent = band ? band.title : home.word;
-      fitWord();
+      drawWord();
       word.classList.remove("swap");
       void word.offsetWidth;
       word.classList.add("swap");
@@ -566,8 +618,7 @@ export function mount(root: HTMLElement): void {
 
     const moving = Math.abs(omega) > 0.0004 || Math.abs(radius - target) > 0.0003;
     if (moving || stale) {
-      draw();
-      stale = false;
+      if (draw()) stale = false;
     }
     frame = requestAnimationFrame(tick);
   }
@@ -640,13 +691,21 @@ export function mount(root: HTMLElement): void {
   new ResizeObserver(() => {
     window.clearTimeout(pending);
     pending = window.setTimeout(() => {
-      fitWord();
       prerender();
+      drawWord();
+      draw();
     }, 80);
   }).observe(deck);
 
-  wide.addEventListener("change", () => {
+  stacked.addEventListener("change", () => {
     tapped = index;
+  });
+
+  window.addEventListener("pageshow", () => {
+    const rect = root.getBoundingClientRect();
+    visible = !document.hidden && rect.bottom > 0 && rect.top < window.innerHeight;
+    stale = true;
+    start();
   });
 
   const faces = document.fonts
@@ -656,9 +715,15 @@ export function mount(root: HTMLElement): void {
         document.fonts.load(`500 12px ${fonts.mono}`),
       ]).catch(() => [])
     : Promise.resolve([]);
+  prerender();
+  reflect();
+  draw();
+  start();
+
   faces.then(() => {
     prerender();
-    reflect();
+    drawWord();
+    draw();
     start();
   });
 }

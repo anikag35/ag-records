@@ -59,29 +59,29 @@ while (cursor < 116) {
           role="img"
           aria-label={`Turntable. A record with ${releases.length} bands, one per release. Use the tracklist to move the needle.`}
         ></canvas>
+
+        <div class="sticker" aria-hidden="true">
+          <svg viewBox="0 0 116 34" preserveAspectRatio="none">
+            {bars.map((bar) => <rect x={bar.x} y="0" width={bar.w} height="34" />)}
+          </svg>
+          <span class="code" data-catalog>{HOME_CATALOG}</span>
+        </div>
+
+        <p class="stamp" aria-hidden="true">
+          <span>Mastered at</span>
+          <strong>AG Records</strong>
+          <span>Berkeley CA</span>
+        </p>
+
+        <p class="pricetag" aria-hidden="true">
+          <span>Pressed</span>
+          <strong data-tag>2026</strong>
+        </p>
       </div>
-
-      <div class="sticker" aria-hidden="true">
-        <svg viewBox="0 0 116 34" preserveAspectRatio="none">
-          {bars.map((bar) => <rect x={bar.x} y="0" width={bar.w} height="34" />)}
-        </svg>
-        <span class="code" data-catalog>{HOME_CATALOG}</span>
-      </div>
-
-      <p class="stamp" aria-hidden="true">
-        <span>Mastered at</span>
-        <strong>AG Records</strong>
-        <span>Berkeley CA</span>
-      </p>
-
-      <p class="pricetag" aria-hidden="true">
-        <span>Pressed</span>
-        <strong data-tag>2026</strong>
-      </p>
     </div>
 
     <div class="wordbox" aria-hidden="true">
-      <span class="word" data-word>{label.name}</span>
+      <canvas class="word" data-word></canvas>
     </div>
 
     <div class="back">
@@ -123,67 +123,49 @@ while (cursor < 116) {
           aria-labelledby="tt-tab-sleeve"
         >
           <h1 class="name">{label.artist}</h1>
-          <p class="facts">{label.tagline}</p>
-          <p class="lead">{label.standfirst}</p>
-          <p class="facts hint">
+          <p class="lead">{label.tagline}</p>
+          <p class="brief">{label.standfirst}</p>
+          <p class="hint">
             <span class="wide-only">Scroll to drop the needle</span>
             <span class="narrow-only">Tap a band to drop the needle</span>
           </p>
         </article>
 
         {
-          releases.map((release) => {
-            const wave = waveformFor(release.repo);
-            return (
-              <article
-                class="panel"
-                role="tabpanel"
-                id={`tt-panel-${release.n}`}
-                aria-labelledby={`tt-tab-${release.n}`}
-                hidden
-              >
-                <h2 class="sr">{release.title}</h2>
-                <p class="facts">
-                  <span>{catalogOf(release.n)}</span>
-                  {release.tag && <span>{release.tag}</span>}
-                  <span>{release.stack.join(" · ")}</span>
-                  {wave && (
-                    <span>
-                      {wave.commits} commits, {wave.days}{" "}
-                      {wave.days === 1 ? "day" : "days"}
-                    </span>
-                  )}
-                </p>
-                <p class="lead">{release.blurb}</p>
-                <div class="notes">
-                  {release.notes.map((paragraph) => (
-                    <p>{paragraph}</p>
-                  ))}
-                </div>
-                {release.clip && (
-                  <video
-                    class="clip"
-                    src={withBase(release.clip)}
-                    poster={release.poster ? withBase(release.poster) : undefined}
-                    controls
-                    muted
-                    loop
-                    playsinline
-                    preload="none"
-                  />
-                )}
-                <ul class="links">
-                  {release.links.map((link) => (
-                    <li>
-                      <a href={link.href} rel="noopener">
-                        {link.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </article>
-            );
-          })
+          releases.map((release) => (
+            <article
+              class="panel"
+              role="tabpanel"
+              id={`tt-panel-${release.n}`}
+              aria-labelledby={`tt-tab-${release.n}`}
+              hidden
+            >
+              <h2 class="sr">{release.title}</h2>
+              <p class="lead">{release.blurb}</p>
+              <p class="brief">{release.brief}</p>
+              {release.clip && (
+                <video
+                  class="clip"
+                  src={withBase(release.clip)}
+                  poster={release.poster ? withBase(release.poster) : undefined}
+                  controls
+                  muted
+                  loop
+                  playsinline
+                  preload="none"
+                />
+              )}
+              <ul class="links">
+                {release.links.map((link) => (
+                  <li>
+                    <a href={link.href} rel="noopener">
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </article>
+          ))
         }
       </div>
     </div>
@@ -192,7 +174,7 @@ while (cursor < 116) {
   <svg class="defs" width="0" height="0" aria-hidden="true">
     <filter id="tt-rough" x="-2%" y="-10%" width="104%" height="120%">
       <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="2" seed="7" result="n"></feTurbulence>
-      <feDisplacementMap in="SourceGraphic" in2="n" scale="1.6"></feDisplacementMap>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="1.1"></feDisplacementMap>
     </filter>
   </svg>
 </section>
@@ -212,10 +194,10 @@ while (cursor < 116) {
 
 <style>
   .tt {
-    --word-h: 17svh;
+    --word-h: min(14svh, 8.6vw);
     --pad: clamp(0.75rem, 1.6vw, 1.5rem);
-    --speck: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.3' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0.925 0 0 0 0 0.925 0 0 0 0 0.918 9 0 0 0 -6.2'/%3E%3C/filter%3E%3Crect width='320' height='320' filter='url(%23s)'/%3E%3C/svg%3E");
-    --wear: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='400'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.04' numOctaves='3' seed='11'/%3E%3CfeColorMatrix values='0 0 0 0 0.925 0 0 0 0 0.925 0 0 0 0 0.918 1.1 0 0 0 -0.66'/%3E%3C/filter%3E%3Crect width='900' height='400' filter='url(%23w)'/%3E%3C/svg%3E");
+    --inset: clamp(0.85rem, 1.9vw, 1.75rem);
+    --caps-row: clamp(2.4rem, 4vw, 3.4rem);
     --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' seed='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23g)'/%3E%3C/svg%3E");
     height: calc(100svh * var(--tt-length));
   }
@@ -235,7 +217,7 @@ while (cursor < 116) {
     flex: 1;
     min-height: 0;
     border: 2px solid var(--text);
-    border-radius: clamp(16px, 2vw, 28px);
+    border-radius: clamp(14px, 2vw, 28px);
     background: var(--ground-raised);
     overflow: hidden;
     isolation: isolate;
@@ -256,33 +238,37 @@ while (cursor < 116) {
 
   .corner {
     position: absolute;
-    top: clamp(0.9rem, 1.6vw, 1.4rem);
+    top: 0;
+    height: var(--caps-row);
     z-index: 3;
     margin: 0;
     display: flex;
+    align-items: center;
     gap: 1.25em;
     font-family: var(--font-caps);
-    font-size: clamp(0.62rem, 0.9vw, 0.8rem);
+    font-size: clamp(0.56rem, 0.9vw, 0.8rem);
     font-weight: 600;
     letter-spacing: 0.3em;
     text-transform: uppercase;
+    white-space: nowrap;
     color: var(--text);
   }
 
   .corner.left {
-    left: clamp(1rem, 2vw, 1.75rem);
+    left: var(--inset);
   }
 
   .corner.right {
-    right: clamp(1rem, 2vw, 1.75rem);
+    right: var(--inset);
   }
 
   .deck {
     position: absolute;
-    top: clamp(2.6rem, 4vw, 3.4rem);
-    left: clamp(0.5rem, 1.2vw, 1.25rem);
-    width: calc(58% - clamp(0.5rem, 1.2vw, 1.25rem));
-    height: calc(100% - clamp(2.6rem, 4vw, 3.4rem) - var(--word-h) * 0.36 - 0.5rem);
+    top: var(--caps-row);
+    left: calc(var(--inset) * 0.6);
+    width: calc(58% - var(--inset) * 0.6);
+    height: calc(100% - var(--caps-row) - var(--word-h) * 0.36 - 0.5rem);
+    container-type: size;
     background: radial-gradient(
       ellipse 62% 62% at 46% 50%,
       rgb(255 255 255 / 0.4),
@@ -290,7 +276,7 @@ while (cursor < 116) {
     );
   }
 
-  canvas {
+  .deck > canvas {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -298,16 +284,24 @@ while (cursor < 116) {
     display: block;
   }
 
-  .sticker {
+  .sticker,
+  .stamp,
+  .pricetag {
     position: absolute;
-    top: clamp(2.6rem, 4.4vw, 3.6rem);
-    right: clamp(1rem, 2vw, 1.75rem);
-    z-index: 4;
-    width: clamp(6.2rem, 9vw, 8.2rem);
-    padding: 0.5rem 0.55rem 0.3rem;
+    z-index: 3;
+    margin: 0;
+    pointer-events: none;
+    font-size: clamp(6.5px, 2.1cqmin, 11px);
+  }
+
+  .sticker {
+    top: 1em;
+    left: 0.4em;
+    width: 10.5em;
+    padding: 0.7em 0.75em 0.45em;
     background: #f7f7f5;
-    clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%);
-    transform: rotate(1.6deg);
+    clip-path: polygon(0 0, calc(100% - 1.6em) 0, 100% 1.6em, 100% 100%, 0 100%);
+    transform: rotate(-2deg);
     filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.25));
   }
 
@@ -316,45 +310,43 @@ while (cursor < 116) {
     position: absolute;
     top: 0;
     right: 0;
-    width: 15px;
-    height: 15px;
+    width: 1.6em;
+    height: 1.6em;
     background: linear-gradient(225deg, #f7f7f5 0 48%, #a9a9a6 50%, #d9d9d6 72%, #efefed 100%);
   }
 
   .sticker svg {
     display: block;
     width: 100%;
-    height: clamp(1.5rem, 2.4vw, 2.1rem);
+    height: 2.7em;
     fill: var(--text);
   }
 
   .code {
     display: block;
-    margin-top: 0.2rem;
+    margin-top: 0.3em;
     font-family: var(--font-mono);
-    font-size: clamp(0.55rem, 0.8vw, 0.7rem);
+    font-size: 1em;
     letter-spacing: 0.22em;
     text-align: center;
     color: var(--text);
   }
 
   .stamp {
-    position: absolute;
-    left: clamp(1rem, 2.2vw, 2rem);
-    bottom: calc(var(--word-h) * 0.36 + 1.1rem);
-    z-index: 3;
-    margin: 0;
+    left: 0;
+    bottom: 0.4em;
     display: grid;
-    gap: 0.1rem;
-    padding: 0.4rem 0.7rem;
-    border: 2px solid var(--text);
-    border-radius: 3px;
+    gap: 0.15em;
+    padding: 0.6em 1em;
+    border: 0.22em solid var(--text);
+    border-radius: 0.3em;
     font-family: var(--font-caps);
-    font-size: clamp(0.5rem, 0.72vw, 0.62rem);
+    font-size: clamp(5.5px, 1.75cqmin, 9.5px);
     font-weight: 700;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     text-align: center;
+    white-space: nowrap;
     color: var(--text);
     opacity: 0.6;
     transform: rotate(-7deg);
@@ -368,22 +360,20 @@ while (cursor < 116) {
   }
 
   .pricetag {
-    position: absolute;
-    left: calc(58% - 4.6rem);
-    bottom: calc(var(--word-h) * 0.36 + 1.4rem);
-    z-index: 4;
-    margin: 0;
+    right: 0;
+    bottom: 0.6em;
     display: grid;
     justify-items: center;
-    gap: 0.05rem;
-    padding: 0.35rem 0.6rem 0.4rem;
+    gap: 0.1em;
+    padding: 0.6em 0.9em 0.65em;
     background: #f7f7f5;
-    border-radius: 3px;
+    border-radius: 0.3em;
     font-family: var(--font-caps);
-    font-size: 0.5rem;
+    font-size: clamp(5.5px, 1.7cqmin, 9px);
     font-weight: 600;
     letter-spacing: 0.2em;
     text-transform: uppercase;
+    white-space: nowrap;
     color: var(--text-soft);
     transform: rotate(5deg);
     filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.25));
@@ -400,30 +390,17 @@ while (cursor < 116) {
   .wordbox {
     position: relative;
     z-index: 5;
+    flex: none;
     height: var(--word-h);
     margin-top: calc(var(--word-h) * -0.36);
-    margin-bottom: clamp(0.5rem, 1.2vh, 0.9rem);
+    margin-bottom: clamp(0.4rem, 1.2vh, 0.9rem);
     pointer-events: none;
   }
 
   .word {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    display: inline-block;
-    white-space: nowrap;
-    transform-origin: 0 100%;
-    font-family: var(--font-display);
-    font-weight: 400;
-    text-transform: uppercase;
-    color: transparent;
-    background-color: var(--text);
-    background-image: var(--speck), var(--wear);
-    background-size:
-      320px 320px,
-      900px 400px;
-    -webkit-background-clip: text;
-    background-clip: text;
+    display: block;
+    width: 100%;
+    height: 100%;
     filter: url(#tt-rough);
   }
 
@@ -441,37 +418,38 @@ while (cursor < 116) {
   .back {
     position: absolute;
     z-index: 4;
-    top: calc(var(--pad) + clamp(2.8rem, 4.6vw, 3.9rem));
-    right: calc(var(--pad) + clamp(1rem, 2vw, 1.75rem));
-    width: calc((100% - var(--pad) * 2) * 0.42 - clamp(1.5rem, 3vw, 3rem));
-    bottom: calc(var(--word-h) + clamp(1.25rem, 2.6vh, 2rem));
+    top: calc(var(--pad) + var(--caps-row));
+    right: calc(var(--pad) + var(--inset));
+    width: calc((100% - var(--pad) * 2) * 0.42 - var(--inset) * 1.4);
+    bottom: calc(var(--word-h) + clamp(0.9rem, 2.4vh, 2rem));
     display: flex;
     flex-direction: column;
-    gap: clamp(1rem, 2.4vh, 1.75rem);
-    overflow: hidden auto;
+    gap: clamp(0.75rem, 2.6vh, 1.9rem);
+    overflow: hidden;
   }
 
   .list {
     display: grid;
-    padding-right: clamp(7rem, 10.5vw, 9.6rem);
+    flex: none;
   }
 
   .list button {
     appearance: none;
     background: none;
     border: 0;
-    padding: 0.28rem 0;
-    min-height: 1.75rem;
+    padding: 0;
+    min-height: clamp(1.3rem, 3.5vh, 1.8rem);
     display: grid;
-    grid-template-columns: 2.1rem auto minmax(0.75rem, 1fr) auto;
-    align-items: baseline;
-    gap: 0.5rem;
+    grid-template-columns: 2em auto minmax(0.5rem, 1fr) auto;
+    align-items: center;
+    gap: 0.6em;
     text-align: left;
     font-family: var(--font-caps);
-    font-size: clamp(0.62rem, 0.82vw, 0.72rem);
+    font-size: clamp(0.56rem, 0.8vw, 0.72rem);
     font-weight: 600;
-    letter-spacing: 0.18em;
+    letter-spacing: clamp(0.1em, 0.015vw + 0.1em, 0.18em);
     text-transform: uppercase;
+    white-space: nowrap;
     color: var(--text-dim);
     cursor: pointer;
     transition: color 140ms var(--ease);
@@ -493,23 +471,26 @@ while (cursor < 116) {
 
   .no {
     justify-self: start;
-    padding: 0.05rem 0.3rem 0.05rem 0.34rem;
-    letter-spacing: 0.08em;
+    padding: 0.1em 0.3em 0.1em 0.38em;
+    letter-spacing: 0.06em;
   }
 
   .rule {
-    align-self: center;
     border-bottom: 1.5px dotted currentColor;
     opacity: 0.55;
+    transform: translateY(0.2em);
   }
 
   .dur {
     font-weight: 600;
-    white-space: nowrap;
+  }
+
+  .panels {
+    min-height: 0;
   }
 
   .panel {
-    max-width: 36rem;
+    max-width: 34rem;
     font-family: var(--font-body);
     animation: drop 260ms var(--ease);
   }
@@ -536,58 +517,33 @@ while (cursor < 116) {
 
   .name {
     font-family: var(--font-body);
-    font-size: clamp(2.2rem, 4.4vw, 4rem);
+    font-size: clamp(1.9rem, 4.8vw, 5rem);
     font-weight: 800;
     letter-spacing: -0.03em;
     line-height: 0.95;
-  }
-
-  .facts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem 1rem;
-    margin-top: 0.5rem;
-    font-family: var(--font-caps);
-    font-size: 0.62rem;
-    font-weight: 600;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-  }
-
-  .facts span:first-child {
-    color: var(--text);
+    margin-bottom: clamp(0.5rem, 1.4vh, 0.9rem);
   }
 
   .lead {
-    margin-top: 0.85rem;
-    font-size: clamp(1rem, 1.35vw, 1.25rem);
-    font-weight: 600;
-    line-height: 1.4;
+    font-size: clamp(0.98rem, 1.8vw, 1.8rem);
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
     color: var(--text);
   }
 
-  .notes {
-    margin-top: 0.7rem;
-    font-size: clamp(0.8rem, 0.98vw, 0.9rem);
+  .brief {
+    margin-top: clamp(0.45rem, 1.2vh, 0.8rem);
+    font-size: clamp(0.82rem, 1.22vw, 1.2rem);
+    font-weight: 400;
     line-height: 1.5;
     color: var(--text-soft);
-    columns: 2;
-    column-gap: 1.25rem;
-  }
-
-  .notes p {
-    margin: 0;
-  }
-
-  .notes p + p {
-    margin-top: 0.6em;
   }
 
   .clip {
     margin-top: 0.9rem;
     width: 100%;
-    max-height: 26vh;
+    max-height: 24vh;
     border: 1.5px solid var(--text);
     border-radius: 6px;
     background: var(--text);
@@ -596,12 +552,12 @@ while (cursor < 116) {
   .links {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.25rem;
-    margin-top: 0.9rem;
+    gap: 0.4rem 1.25rem;
+    margin-top: clamp(0.6rem, 1.6vh, 1.1rem);
     padding: 0;
     list-style: none;
     font-family: var(--font-caps);
-    font-size: 0.66rem;
+    font-size: clamp(0.58rem, 0.82vw, 0.8rem);
     font-weight: 700;
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -619,7 +575,13 @@ while (cursor < 116) {
   }
 
   .hint {
-    margin-top: 1.1rem;
+    margin-top: clamp(0.7rem, 2vh, 1.3rem);
+    font-family: var(--font-caps);
+    font-size: clamp(0.54rem, 0.74vw, 0.64rem);
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
   }
 
   .narrow-only {
@@ -630,9 +592,10 @@ while (cursor < 116) {
     position: absolute;
   }
 
-  @media (max-width: 56rem) {
+  @media (max-width: 49.99rem), (max-aspect-ratio: 1/1) {
     .tt {
-      --word-h: 9vw;
+      --word-h: 8.6vw;
+      --caps-row: 2.3rem;
       height: auto;
     }
 
@@ -645,30 +608,14 @@ while (cursor < 116) {
     }
 
     .frame {
-      height: 58svh;
-      min-height: 22rem;
+      height: min(58svh, 135vw);
+      min-height: 20rem;
     }
 
     .deck {
-      top: 2.3rem;
       left: 0.4rem;
       width: calc(100% - 0.8rem);
-      height: calc(100% - 2.3rem - var(--word-h) * 0.36 - 0.4rem);
-    }
-
-    .sticker {
-      top: 2.5rem;
-      width: 5.2rem;
-    }
-
-    .pricetag {
-      left: auto;
-      right: 1rem;
-      bottom: calc(var(--word-h) * 0.36 + 0.9rem);
-    }
-
-    .stamp {
-      bottom: calc(var(--word-h) * 0.36 + 0.8rem);
+      height: calc(100% - var(--caps-row) - var(--word-h) * 0.36 - 0.4rem);
     }
 
     .back {
@@ -679,18 +626,17 @@ while (cursor < 116) {
       gap: 1.5rem;
     }
 
-    .list {
-      padding-right: 0;
-    }
-
     .list button {
       min-height: 2.5rem;
-      font-size: 0.72rem;
+      font-size: clamp(0.62rem, 2.9vw, 0.76rem);
     }
 
-    .notes {
-      columns: 1;
-      font-size: 0.9rem;
+    .name {
+      font-size: clamp(2rem, 9vw, 3rem);
+    }
+
+    .brief {
+      font-size: 1rem;
     }
 
     .wide-only {
