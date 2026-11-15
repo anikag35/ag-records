@@ -50,7 +50,7 @@ export const label = {
   tagline: "Systems and AI reliability",
   /** The sentence under the title. Two lines at most. */
   standfirst:
-    "I build infrastructure that makes AI systems trustworthy — evaluating them without bias, stopping them being hijacked, and letting them act on production safely. Rust and TypeScript, mostly.",
+    "I build infrastructure that makes AI systems trustworthy: evaluating them without bias, stopping them being hijacked, letting them act on production safely. Rust and TypeScript, mostly.",
   location: "Berkeley, California",
 };
 
@@ -71,7 +71,7 @@ export const releases: Release[] = [
     blurb:
       "A drop-in proxy that sits between an AI agent and its tools, and refuses the actions it was tricked into taking.",
     notes: [
-      "Agents that can use tools can be talked into using them badly. A web page, an email, or a file an agent reads can carry instructions aimed at the agent rather than the user — and from the model's side, retrieved text and genuine instructions look alike.",
+      "Agents that can use tools can be talked into using them badly. A web page, an email, or a file an agent reads can carry instructions aimed at the agent rather than the user, and from the model's side, retrieved text and genuine instructions look alike.",
       "tripwire sits in front of the Model Context Protocol as a proxy, so it needs no change to the agent or the tools. It watches the gap between what the user asked for and what the agent is about to do, and blocks actions that only make sense if something in the content was giving orders.",
       "Built in two days at CalHacks. The commit waveform shows exactly that: one dense burst and nothing either side.",
     ],
@@ -84,12 +84,12 @@ export const releases: Release[] = [
     title: "double-blind",
     repo: "double-blind",
     stack: ["Rust", "Distributed"],
-    when: "Aug – Nov 2026",
+    when: "Aug to Nov 2026",
     blurb:
       "A fault-tolerant evaluation platform for language models, built to remove the biases that make model comparisons lie.",
     notes: [
       "Using a language model to judge other models is standard practice and quietly unreliable. Judges favour whichever answer they saw first, prefer longer responses, and recognise their own family's writing. An evaluation that ignores this produces confident numbers that mean very little.",
-      "double-blind runs evaluations with the conditions that cause those effects controlled — identities hidden, order randomised and counterbalanced — and distributes the work so a failed node loses one judgement rather than the whole run.",
+      "double-blind runs evaluations with the conditions that cause those effects controlled (identities hidden, order randomised and counterbalanced), and distributes the work so a failed node loses one judgement rather than the whole run.",
       "Written in Rust, and the longest-running thing here: two and a half months of steady work rather than a sprint.",
     ],
     links: [
@@ -110,7 +110,7 @@ export const releases: Release[] = [
     notes: [
       "The hard part of an algorithm visualizer is not the algorithms, it is the animation state. The obvious design has each algorithm pause itself mid-run, which reads naturally and is a dead end: the algorithm owns control flow, so pausing means parking a thread and stepping backwards is impossible.",
       "So nothing here animates itself. Each algorithm runs to completion immediately and records its operations into a reversible event log. Rendering becomes a pure function of (trace, cursor), and stepping back, scrubbing and reverse playback all collapse into cursor arithmetic. The invariant that buys it: every step carries enough information to undo itself. Property tests assert that applying every step forward and then backward returns bit-for-bit to the start.",
-      "Published on crates.io, with the algorithm core split out as a library that has no dependency on the terminal — which is what will let it run in a browser.",
+      "Published on crates.io, with the algorithm core split out as a library that has no dependency on the terminal, which is what will let it run in a browser.",
     ],
     links: [
       { label: "Source", href: "https://github.com/anikag35/algoscope" },
@@ -125,7 +125,7 @@ export const releases: Release[] = [
     title: "gepa-polyglot",
     repo: "gepa-polyglot",
     stack: ["Python", "gRPC", "Rust", "TypeScript"],
-    when: "Mar – Aug 2026",
+    when: "Mar to Aug 2026",
     tag: "Sky Computing Lab",
     blurb:
       "A bidirectional gRPC bridge that lets prompt optimization run from TypeScript or Rust while the evaluators stay native.",
@@ -151,7 +151,7 @@ export const releases: Release[] = [
       "An on-call agent for AWS that investigates an alert, finds the root cause, proposes a fix, and writes the post-mortem.",
     notes: [
       "On-call work is mostly retrieval under time pressure: pull the metrics, read the logs, check what deployed, form a theory, test it. That shape suits an agent, as long as it shows its reasoning rather than asserting an answer.",
-      "cloudscape walks an alert through investigation to root cause to remediation, then drafts the post-mortem from what it actually did — so the write-up matches the investigation instead of being reconstructed afterwards.",
+      "cloudscape walks an alert through investigation to root cause to remediation, then drafts the post-mortem from what it actually did, so the write-up matches the investigation instead of being reconstructed afterwards.",
     ],
     links: [
       { label: "Source", href: "https://github.com/anikag35/cloudscape" },
@@ -175,7 +175,7 @@ export const discography: Credit[] = [
   {
     org: "UC Berkeley · Sky Computing Lab",
     role: "Researcher",
-    when: "2026 – present",
+    when: "2026 to present",
     notes: [
       "Built gepa-polyglot: a gRPC service exposing prompt optimization to TypeScript and Rust with native-language evaluators.",
     ],
@@ -192,7 +192,7 @@ export const discography: Credit[] = [
 export const linerNotes = {
   firstSingle: {
     title: "First single",
-    body: "A looping app for dancers, built at hackTJ — record a phrase, loop it, and keep your hands free while you work the choreography. First thing I shipped that someone else used, and the reason this site is laid out like a record.",
+    body: "A looping app for dancers, built at hackTJ. Record a phrase, loop it, and keep your hands free while you work the choreography. First thing I shipped that someone else used, and the reason this site is laid out like a record.",
   },
   recordedAt: ["Berkeley, CA", "Arlington, VA", "Northern Virginia"],
   /** TODO: swap in real playlist links. */
