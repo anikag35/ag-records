@@ -69,22 +69,24 @@ import { label } from "../data/catalogue";
   }
 
   .label-mark span:first-child {
-    color: var(--paper-soft);
+    color: var(--silver);
   }
 
   .cat {
     padding: 0.15rem 0.5rem;
-    border: 1px solid var(--ink-line);
-    color: var(--brass);
+    border: 1px solid var(--line);
+    color: var(--silver);
   }
 
   .title {
     margin: 0;
     font-family: var(--font-display);
-    font-size: clamp(3.5rem, 14vw, 9rem);
-    font-weight: 400;
-    line-height: 0.86;
-    letter-spacing: -0.02em;
+    font-size: calc(clamp(3.5rem, 14vw, 9rem) * var(--display-scale));
+    font-weight: var(--display-weight);
+    font-stretch: var(--display-stretch);
+    text-transform: var(--display-transform);
+    line-height: var(--display-leading);
+    letter-spacing: var(--display-tracking);
     text-wrap: balance;
   }
 
@@ -92,15 +94,14 @@ import { label } from "../data/catalogue";
     margin: clamp(1rem, 3vw, 1.5rem) 0 0;
     font-size: clamp(1.05rem, 2.5vw, 1.5rem);
     font-weight: 500;
-    color: var(--spot);
+    color: var(--silver);
   }
 
   .standfirst {
     margin: clamp(1.5rem, 4vw, 2rem) 0 0;
     max-width: 44ch;
-    color: var(--paper-soft);
-    font-size: 1.0625rem;
-    line-height: 1.65;
+    color: var(--silver);
+    line-height: 1.7;
   }
 
   .where {
@@ -125,13 +126,13 @@ import { label } from "../data/catalogue";
       /* grooves */
       repeating-radial-gradient(
         circle at 50% 50%,
-        #100d09 0 3px,
-        #171309 3px 5px
+        #0b0c0e 0 3px,
+        #14151a 3px 5px
       ),
-      radial-gradient(circle at 32% 28%, #2a241b 0%, #0b0a07 70%);
+      radial-gradient(circle at 32% 28%, #25272d 0%, #08090a 70%);
     box-shadow:
       0 1.5rem 3.5rem rgb(0 0 0 / 0.55),
-      inset 0 0 0 1px var(--ink-line);
+      inset 0 0 0 1px var(--line);
     animation: spin 24s linear infinite;
   }
 
@@ -144,10 +145,10 @@ import { label } from "../data/catalogue";
     background: conic-gradient(
       from 210deg,
       transparent 0deg,
-      rgb(236 226 208 / 0.07) 28deg,
+      rgb(233 236 239 / 0.08) 28deg,
       transparent 70deg,
       transparent 180deg,
-      rgb(236 226 208 / 0.05) 208deg,
+      rgb(233 236 239 / 0.05) 208deg,
       transparent 250deg
     );
   }
@@ -158,10 +159,20 @@ import { label } from "../data/catalogue";
     width: 36%;
     aspect-ratio: 1;
     border-radius: 50%;
-    background: var(--spot);
+    background: conic-gradient(
+      from 20deg,
+      #e9ecef,
+      #9aa0a8,
+      #e9ecef,
+      #b9bec6,
+      #8b9099,
+      #dfe3e7,
+      #a3a8b0,
+      #e9ecef
+    );
     display: grid;
     place-items: center;
-    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.25);
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.35);
   }
 
   /* The spindle hole. */
@@ -179,7 +190,7 @@ import { label } from "../data/catalogue";
     font-size: 0.6rem;
     letter-spacing: 0.18em;
     color: var(--ink);
-    transform: translateY(-28%);
+    transform: translateY(-1.55rem);
   }
 
   @keyframes spin {
@@ -201,18 +212,7 @@ import { label } from "../data/catalogue";
   }
 
   .arrow {
-    color: var(--spot);
-    animation: nudge 2.4s ease-in-out infinite;
-  }
-
-  @keyframes nudge {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(0.25rem);
-    }
+    color: var(--accent);
   }
 
   /* The record is the first thing to go when space runs out: it carries no

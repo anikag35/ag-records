@@ -1,56 +1,36 @@
-/*
- * Design system.
- *
- * The reference is a mid-century record sleeve -- Blue Note, not Spotify.
- * Deep warm ink, cream stock, one vermillion spot colour, heavy condensed
- * display type against a monospace used the way a sleeve uses small caps:
- * for catalogue numbers, durations and credits.
- *
- * Everything is a token. Nothing below this block hard-codes a colour.
- */
-
-@import "@fontsource/instrument-serif";
-@import "@fontsource/instrument-serif/400-italic.css";
-@import "@fontsource-variable/archivo";
-@import "@fontsource-variable/jetbrains-mono";
+@import "@fontsource-variable/big-shoulders-display";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+@import "@fontsource/ibm-plex-mono/600.css";
 
 :root {
-  /* Warm near-black, like ink on board rather than pure #000. */
-  --ink: #15120d;
-  --ink-raised: #1d1913;
-  --ink-line: #312a20;
+  --ink: #111214;
+  --sleeve: #1b1c20;
+  --line: #2b2d33;
+  --foil: #e9ecef;
+  --silver: #b9bec6;
+  --silver-dim: #8b9099;
+  --accent: #e8442e;
 
-  /* Aged paper, not white. */
-  --paper: #ece2d0;
-  --paper-soft: #bdb2a0;
-  --paper-faint: #7d7363;
+  --font-display: "Big Shoulders Display Variable", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+  --font-body: var(--font-mono);
 
-  /* One spot colour, printed hot. */
-  --spot: #e2603a;
-  --spot-soft: #b74b2c;
-  /* Brass, for the second register: catalogue marks, rules. */
-  --brass: #c9a227;
+  --display-weight: 800;
+  --display-stretch: 100%;
+  --display-transform: uppercase;
+  --display-tracking: 0.005em;
+  --display-leading: 0.86;
+  --display-scale: 1;
+  --body-size: 0.9375rem;
 
-  /* Instrument Serif for display: sharp, high-contrast and editorial, the
-     register of an ECM or Verve sleeve rather than a tech portfolio. Archivo
-     carries body copy, where personality would cost legibility. */
-  --font-display: "Instrument Serif", ui-serif, Georgia, serif;
-  --font-body: "Archivo Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, monospace;
-
-  --measure: 64ch;
+  --ease: cubic-bezier(0.2, 0.7, 0.1, 1);
+  --measure: 62ch;
   --gutter: clamp(1.25rem, 5vw, 4rem);
-  --rule: 1px solid var(--ink-line);
+  --rule: 1px solid var(--line);
 
   color-scheme: dark;
 }
-
-/*
- * The palette is deliberately single-mode. A record sleeve is a printed
- * object with one set of inks; a light variant would be a different design,
- * not the same one inverted. Declaring color-scheme above keeps form
- * controls and scrollbars consistent with it.
- */
 
 *,
 *::before,
@@ -66,26 +46,21 @@ html {
 body {
   margin: 0;
   background: var(--ink);
-  color: var(--paper);
+  color: var(--foil);
   font-family: var(--font-body);
-  font-size: clamp(1rem, 0.96rem + 0.2vw, 1.075rem);
-  line-height: 1.6;
+  font-size: var(--body-size);
+  line-height: 1.7;
   font-synthesis-weight: none;
   -webkit-font-smoothing: antialiased;
 }
 
-/*
- * Paper grain. A single repeating SVG turbulence at very low opacity, fixed
- * so it reads as the stock rather than as a texture scrolling past. Pointer
- * events off so it never intercepts a click.
- */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 100;
   pointer-events: none;
-  opacity: 0.035;
+  opacity: 0.03;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
@@ -104,20 +79,18 @@ a {
   color: inherit;
   text-underline-offset: 0.25em;
   text-decoration-thickness: 1px;
-  transition: color 120ms ease;
+  transition: color 140ms var(--ease);
 }
 
 a:hover {
-  color: var(--spot);
+  color: var(--foil);
 }
 
 :focus-visible {
-  outline: 2px solid var(--spot);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
   border-radius: 2px;
 }
-
-/* Layout ------------------------------------------------------------- */
 
 .shell {
   width: 100%;
@@ -131,14 +104,24 @@ a:hover {
   border-top: var(--rule);
 }
 
-/* Small-caps monospace, the sleeve's voice for metadata. */
 .marque {
   font-family: var(--font-mono);
   font-size: 0.7rem;
   font-weight: 500;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--paper-faint);
+  color: var(--silver-dim);
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: calc(clamp(2rem, 5.5vw, 3.25rem) * var(--display-scale));
+  font-weight: var(--display-weight);
+  font-stretch: var(--display-stretch);
+  text-transform: var(--display-transform);
+  letter-spacing: var(--display-tracking);
+  line-height: 1;
 }
 
 .section-head {
@@ -152,21 +135,19 @@ a:hover {
 
 .prose {
   max-width: var(--measure);
-  color: var(--paper-soft);
+  color: var(--silver);
 }
 
 .prose p + p {
   margin-top: 0.9em;
 }
 
-/* Skip link ----------------------------------------------------------- */
-
 .skip {
   position: absolute;
   left: -9999px;
   top: 0;
   z-index: 200;
-  background: var(--spot);
+  background: var(--foil);
   color: var(--ink);
   padding: 0.6rem 1rem;
   font-family: var(--font-mono);
@@ -177,8 +158,6 @@ a:hover {
   left: 0.5rem;
   top: 0.5rem;
 }
-
-/* Reduced motion ------------------------------------------------------ */
 
 @media (prefers-reduced-motion: reduce) {
   html {

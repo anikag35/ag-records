@@ -99,7 +99,7 @@ const stat = wave
     padding-block: 1.15rem;
     cursor: pointer;
     list-style: none;
-    transition: background-color 140ms ease;
+    transition: background-color 140ms var(--ease);
   }
 
   .row::-webkit-details-marker {
@@ -107,24 +107,27 @@ const stat = wave
   }
 
   .row:hover {
-    background: var(--ink-raised);
+    background: var(--sleeve);
   }
 
   /* The whole row is the control, so the focus ring belongs to the row. */
   .row:focus-visible {
-    outline: 2px solid var(--spot);
+    outline: 2px solid var(--accent);
     outline-offset: -2px;
   }
 
   .n {
-    color: var(--paper-faint);
+    color: var(--silver-dim);
     font-size: 0.8rem;
-    transition: color 140ms ease;
+    transition: color 140ms var(--ease);
   }
 
-  .track[open] .n,
   .row:hover .n {
-    color: var(--spot);
+    color: var(--foil);
+  }
+
+  .track[open] .n {
+    color: var(--accent);
   }
 
   .main {
@@ -146,17 +149,17 @@ const stat = wave
     font-size: 0.62rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--brass);
-    border: 1px solid color-mix(in oklab, var(--brass) 35%, transparent);
+    color: var(--silver);
+    border: 1px solid var(--line);
     padding: 0.1rem 0.4rem;
     border-radius: 2px;
   }
 
   .blurb {
-    color: var(--paper-soft);
-    font-size: 0.9375rem;
-    line-height: 1.5;
-    max-width: 52ch;
+    color: var(--silver);
+    font-size: 0.875rem;
+    line-height: 1.55;
+    max-width: 56ch;
   }
 
   .stack {
@@ -180,7 +183,7 @@ const stat = wave
 
   .stat {
     margin: 0 0 1.1rem;
-    color: var(--brass);
+    color: var(--silver);
   }
 
   .links {
@@ -195,14 +198,14 @@ const stat = wave
   }
 
   .links a {
-    color: var(--spot);
+    color: var(--foil);
     text-decoration: none;
-    border-bottom: 1px solid color-mix(in oklab, var(--spot) 40%, transparent);
+    border-bottom: 1px solid var(--silver-dim);
     padding-bottom: 0.1rem;
   }
 
   .links a:hover {
-    border-bottom-color: var(--spot);
+    border-bottom-color: var(--foil);
   }
 
   .clip {
@@ -211,7 +214,7 @@ const stat = wave
 
   .clip video {
     width: 100%;
-    border: 1px solid var(--ink-line);
+    border: 1px solid var(--line);
     border-radius: 3px;
     background: #000;
   }
