@@ -1,0 +1,254 @@
+---
+/**
+ * One track in the list.
+ *
+ * Built on <details>/<summary> rather than a JavaScript accordion. That gets
+ * keyboard support, screen-reader semantics and in-page find for free, works
+ * with JS disabled, and means the expanded copy is real text in the document
+ * rather than something a script reveals. A portfolio's content should never
+ * be behind an interaction.
+ */
+import Waveform from "./Waveform.astro";
+import { waveformFor, type Release } from "../data/catalogue";
+
+type Props = {
+  release: Release;
+};
+
+const { release } = Astro.props;
+const n = String(release.n).padStart(2, "0");
+
+// Stated in words as well as drawn. A quiet waveform should read as "ten days
+// of work" rather than as missing data.
+const wave = waveformFor(release.repo);
+const stat = wave
+  ? `${wave.commits} commits · ${wave.days} day${wave.days === 1 ? "" : "s"}`
+  : null;
+---
+
+<details class="track" name="tracklist">
+  <summary class="row">
+    <span class="n marque">{n}</span>
+
+    <span class="main">
+      <span class="title">{release.title}</span>
+      {release.tag && <span class="tag">{release.tag}</span>}
+      <span class="blurb">{release.blurb}</span>
+    </span>
+
+    <span class="stack marque">{release.stack.join(" · ")}</span>
+
+    <span class="wave-cell"><Waveform repo={release.repo} /></span>
+
+    <span class="when marque">{release.when}</span>
+  </summary>
+
+  <div class="notes">
+    <div class="prose">
+      {stat && <p class="marque stat">{stat}</p>}
+      {release.notes.map((p) => <p>{p}</p>)}
+
+      <ul class="links">
+        {
+          release.links.map((l) => (
+            <li>
+              <a href={l.href} rel="noopener">
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    {
+      release.clip && (
+        <figure class="clip">
+          {/* Press play. preload="none" so five clips cost nothing to
+              someone who only came to read. */}
+          <video
+            src={release.clip}
+            poster={release.poster ?? undefined}
+            controls
+            muted
+            loop
+            playsinline
+            preload="none"
+          />
+        </figure>
+      )
+    }
+  </div>
+</details>
+
+<style>
+  .track {
+    border-bottom: var(--rule);
+  }
+
+  .track:first-of-type {
+    border-top: var(--rule);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr) auto auto 5.5rem;
+    align-items: center;
+    gap: clamp(0.75rem, 2vw, 1.75rem);
+    padding-block: 1.15rem;
+    cursor: pointer;
+    list-style: none;
+    transition: background-color 140ms ease;
+  }
+
+  .row::-webkit-details-marker {
+    display: none;
+  }
+
+  .row:hover {
+    background: var(--ink-raised);
+  }
+
+  /* The whole row is the control, so the focus ring belongs to the row. */
+  .row:focus-visible {
+    outline: 2px solid var(--spot);
+    outline-offset: -2px;
+  }
+
+  .n {
+    color: var(--paper-faint);
+    font-size: 0.8rem;
+    transition: color 140ms ease;
+  }
+
+  .track[open] .n,
+  .row:hover .n {
+    color: var(--spot);
+  }
+
+  .main {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .title {
+    font-family: var(--font-mono);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .tag {
+    justify-self: start;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brass);
+    border: 1px solid color-mix(in oklab, var(--brass) 35%, transparent);
+    padding: 0.1rem 0.4rem;
+    border-radius: 2px;
+  }
+
+  .blurb {
+    color: var(--paper-soft);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    max-width: 52ch;
+  }
+
+  .stack {
+    white-space: nowrap;
+  }
+
+  .when {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  /* Expanded -------------------------------------------------------- */
+
+  .notes {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+    gap: clamp(1.5rem, 4vw, 3rem);
+    padding: 0.5rem 0 2.5rem 3.5rem;
+    align-items: start;
+  }
+
+  .stat {
+    margin: 0 0 1.1rem;
+    color: var(--brass);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+  }
+
+  .links a {
+    color: var(--spot);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in oklab, var(--spot) 40%, transparent);
+    padding-bottom: 0.1rem;
+  }
+
+  .links a:hover {
+    border-bottom-color: var(--spot);
+  }
+
+  .clip {
+    margin: 0;
+  }
+
+  .clip video {
+    width: 100%;
+    border: 1px solid var(--ink-line);
+    border-radius: 3px;
+    background: #000;
+  }
+
+  /* Narrow ---------------------------------------------------------- */
+
+  @media (max-width: 62rem) {
+    .row {
+      grid-template-columns: 2rem minmax(0, 1fr) auto;
+      row-gap: 0.5rem;
+    }
+
+    /* The waveform is ornament carrying data; the stack and dates are the
+       facts. On a phone the ornament goes. */
+    .wave-cell {
+      display: none;
+    }
+
+    .stack {
+      grid-column: 2;
+      font-size: 0.65rem;
+    }
+
+    .when {
+      grid-column: 3;
+      grid-row: 1;
+      align-self: start;
+    }
+
+    .notes {
+      grid-template-columns: 1fr;
+      padding-left: 2rem;
+    }
+  }
+
+  @media (max-width: 34rem) {
+    .notes {
+      padding-left: 0;
+    }
+  }
+</style>

@@ -1,0 +1,82 @@
+---
+/**
+ * A track's commit history, drawn as an audio waveform.
+ *
+ * The bars are real: one per time bucket between a repo's first and last
+ * commit, from `npm run commits`. Mirrored around a centre line because that
+ * is what a waveform looks like, and because the symmetry makes a sparse
+ * history read as quiet rather than as missing.
+ */
+import { waveformFor } from "../data/catalogue";
+
+type Props = {
+  repo: string;
+};
+
+const { repo } = Astro.props;
+const data = waveformFor(repo);
+
+const WIDTH = 240;
+const HEIGHT = 34;
+const GAP = 1;
+
+const bars = data?.bars ?? [];
+const barWidth = bars.length ? WIDTH / bars.length : 0;
+
+/** Accessible summary, so this is not a decorative blob to a screen reader. */
+const summary = data
+  ? `${data.commits} commits over ${data.days} day${data.days === 1 ? "" : "s"}`
+  : "";
+---
+
+{
+  bars.length > 0 && (
+    <svg
+      class="wave"
+      viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+      width={WIDTH}
+      height={HEIGHT}
+      role="img"
+      aria-label={`Commit activity: ${summary}`}
+      preserveAspectRatio="none"
+    >
+      {bars.map((v, i) => {
+        const h = Math.max(1, v * HEIGHT);
+        return (
+          <rect
+            x={i * barWidth}
+            y={(HEIGHT - h) / 2}
+            width={Math.max(0.5, barWidth - GAP)}
+            height={h}
+            rx={Math.min(0.75, barWidth / 4)}
+          />
+        );
+      })}
+    </svg>
+  )
+}
+
+<style>
+  .wave {
+    display: block;
+    width: 100%;
+    max-width: 15rem;
+    height: 2.125rem;
+    overflow: visible;
+  }
+
+  .wave rect {
+    fill: var(--paper-faint);
+    transition: fill 160ms ease;
+  }
+
+  /* Lights up with the row it belongs to. */
+  :global(.track:hover) .wave rect,
+  :global(.track[open]) .wave rect {
+    fill: var(--spot-soft);
+  }
+
+  :global(.track[open]) .wave rect {
+    fill: var(--spot);
+  }
+</style>

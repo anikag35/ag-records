@@ -1,0 +1,102 @@
+---
+/** Experience, set as a back catalogue: one entry per release. */
+import { discography } from "../data/catalogue";
+---
+
+<section class="section" id="discography">
+  <div class="shell">
+    <div class="section-head">
+      <h2 class="heading">Back catalogue</h2>
+      <p class="marque">Where the work was done</p>
+    </div>
+
+    <ol class="list">
+      {
+        discography.map((credit) => (
+          <li class="entry">
+            <div class="meta">
+              <p class="org">{credit.org}</p>
+              <p class="marque role">{credit.role}</p>
+            </div>
+
+            <div class="prose body">
+              {credit.notes.map((n) => (
+                <p>{n}</p>
+              ))}
+            </div>
+
+            <p class="marque when">{credit.when}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .heading {
+    margin: 0;
+    font-size: clamp(1.75rem, 5vw, 2.75rem);
+    font-weight: 700;
+    font-stretch: 90%;
+    letter-spacing: -0.02em;
+  }
+
+  .list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .entry {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.3fr) 7rem;
+    gap: clamp(1rem, 3vw, 2.5rem);
+    padding-block: clamp(1.5rem, 3vw, 2rem);
+    border-top: var(--rule);
+    align-items: start;
+  }
+
+  .meta {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .org {
+    margin: 0;
+    font-size: 1.0625rem;
+    font-weight: 600;
+  }
+
+  .role {
+    margin: 0;
+    color: var(--spot);
+  }
+
+  .body {
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+
+  .body p {
+    margin: 0;
+  }
+
+  .when {
+    text-align: right;
+  }
+
+  @media (max-width: 56rem) {
+    .entry {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .body {
+      grid-column: 1 / -1;
+    }
+
+    .when {
+      align-self: start;
+    }
+  }
+</style>

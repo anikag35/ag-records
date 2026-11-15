@@ -1,0 +1,234 @@
+---
+/**
+ * The front of the sleeve: label mark, artist, title, standfirst.
+ *
+ * Laid out like a record cover — the label and catalogue number set small at
+ * the top, the name at poster scale, the credit underneath. The record itself
+ * is pure CSS (concentric grooves from a repeating radial gradient) rather
+ * than an image, so it costs nothing to load and stays sharp at any size.
+ */
+import { label } from "../data/catalogue";
+---
+
+<header class="sleeve">
+  <div class="shell sleeve-inner">
+    <div class="copy">
+      <p class="marque label-mark">
+        <span>{label.name}</span>
+        <span class="cat">{label.catalogue}</span>
+      </p>
+
+      <h1 class="title">{label.artist}</h1>
+
+      <p class="credit">{label.tagline}</p>
+
+      <p class="standfirst">{label.standfirst}</p>
+
+      <p class="marque where">{label.location}</p>
+    </div>
+
+    <!-- Decorative: the accessible content is all in the column to the left. -->
+    <div class="record" aria-hidden="true">
+      <div class="disc">
+        <div class="centre">
+          <span class="centre-text">{label.catalogue}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <a class="cue" href="#releases">
+    <span class="marque">Side A</span>
+    <span class="arrow">&darr;</span>
+  </a>
+</header>
+
+<style>
+  .sleeve {
+    position: relative;
+    min-height: min(100svh, 54rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: clamp(4rem, 12vh, 8rem) 5rem;
+    padding-top: calc(clamp(4rem, 12vh, 8rem) + env(safe-area-inset-top, 0px));
+  }
+
+  .sleeve-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: clamp(2rem, 6vw, 5rem);
+    align-items: center;
+  }
+
+  .label-mark {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0 0 clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  .label-mark span:first-child {
+    color: var(--paper-soft);
+  }
+
+  .cat {
+    padding: 0.15rem 0.5rem;
+    border: 1px solid var(--ink-line);
+    color: var(--brass);
+  }
+
+  .title {
+    margin: 0;
+    font-size: clamp(3.25rem, 13vw, 8rem);
+    font-weight: 800;
+    font-stretch: 85%;
+    line-height: 0.88;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  .credit {
+    margin: clamp(1rem, 3vw, 1.5rem) 0 0;
+    font-size: clamp(1.05rem, 2.5vw, 1.5rem);
+    font-weight: 500;
+    color: var(--spot);
+  }
+
+  .standfirst {
+    margin: clamp(1.5rem, 4vw, 2rem) 0 0;
+    max-width: 44ch;
+    color: var(--paper-soft);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+  }
+
+  .where {
+    margin: clamp(1.5rem, 4vw, 2rem) 0 0;
+  }
+
+  /* The record ------------------------------------------------------- */
+
+  .record {
+    display: grid;
+    place-items: center;
+  }
+
+  .disc {
+    position: relative;
+    width: min(100%, 23rem);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background:
+      /* grooves */
+      repeating-radial-gradient(
+        circle at 50% 50%,
+        #100d09 0 3px,
+        #171309 3px 5px
+      ),
+      radial-gradient(circle at 32% 28%, #2a241b 0%, #0b0a07 70%);
+    box-shadow:
+      0 1.5rem 3.5rem rgb(0 0 0 / 0.55),
+      inset 0 0 0 1px var(--ink-line);
+    animation: spin 24s linear infinite;
+  }
+
+  /* A sheen across the vinyl, as if lit from one side. */
+  .disc::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(
+      from 210deg,
+      transparent 0deg,
+      rgb(236 226 208 / 0.07) 28deg,
+      transparent 70deg,
+      transparent 180deg,
+      rgb(236 226 208 / 0.05) 208deg,
+      transparent 250deg
+    );
+  }
+
+  .centre {
+    position: relative;
+    z-index: 1;
+    width: 36%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--spot);
+    display: grid;
+    place-items: center;
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.25);
+  }
+
+  /* The spindle hole. */
+  .centre::after {
+    content: "";
+    position: absolute;
+    width: 11%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--ink);
+  }
+
+  .centre-text {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    color: var(--ink);
+    transform: translateY(-28%);
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Scroll cue ------------------------------------------------------- */
+
+  .cue {
+    position: absolute;
+    left: var(--gutter);
+    bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+  }
+
+  .arrow {
+    color: var(--spot);
+    animation: nudge 2.4s ease-in-out infinite;
+  }
+
+  @keyframes nudge {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(0.25rem);
+    }
+  }
+
+  /* The record is the first thing to go when space runs out: it carries no
+     information, and the type needs the room more than the ornament does. */
+  @media (max-width: 56rem) {
+    .sleeve-inner {
+      grid-template-columns: 1fr;
+    }
+
+    .record {
+      display: none;
+    }
+
+    .sleeve {
+      min-height: auto;
+      padding-block: clamp(3.5rem, 14vh, 6rem) 6rem;
+    }
+  }
+</style>

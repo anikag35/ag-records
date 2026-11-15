@@ -1,0 +1,72 @@
+---
+import Base from "../layouts/Base.astro";
+import Sleeve from "../components/Sleeve.astro";
+import Track from "../components/Track.astro";
+import Discography from "../components/Discography.astro";
+import LinerNotes from "../components/LinerNotes.astro";
+import { releases, label } from "../data/catalogue";
+
+const totalCommits = releases.length;
+---
+
+<Base>
+  <Sleeve />
+
+  <main>
+    <section class="section" id="releases">
+      <div class="shell">
+        <div class="section-head">
+          <h2 class="heading">Releases</h2>
+          <p class="marque">{totalCommits} tracks · press a row for the notes</p>
+        </div>
+
+        <div class="tracklist">
+          {releases.map((release) => <Track release={release} />)}
+        </div>
+      </div>
+    </section>
+
+    <Discography />
+    <LinerNotes />
+  </main>
+
+  <footer class="section footer">
+    <div class="shell footer-inner">
+      <p class="marque">
+        {label.name} · {label.catalogue}
+      </p>
+      <p class="marque">
+        Waveforms are real commit history ·
+        <a href="https://github.com/anikag35/ag-records" rel="noopener">
+          source
+        </a>
+      </p>
+    </div>
+  </footer>
+</Base>
+
+<style>
+  .heading {
+    margin: 0;
+    font-size: clamp(1.75rem, 5vw, 2.75rem);
+    font-weight: 700;
+    font-stretch: 90%;
+    letter-spacing: -0.02em;
+  }
+
+  .footer {
+    padding-block: 2.5rem;
+    padding-bottom: calc(2.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .footer a {
+    color: var(--paper-soft);
+  }
+</style>

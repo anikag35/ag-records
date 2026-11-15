@@ -1,0 +1,40 @@
+---
+import "../styles/global.css";
+import { label } from "../data/catalogue";
+
+type Props = {
+  title?: string;
+  description?: string;
+};
+
+const {
+  title = `${label.artist} — ${label.tagline}`,
+  description = label.standfirst,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#15120d" />
+  </head>
+  <body>
+    <!--
+      A keyboard user should be able to reach the tracklist without tabbing
+      through the whole sleeve.
+    -->
+    <a class="skip" href="#releases">Skip to releases</a>
+    <slot />
+  </body>
+</html>
