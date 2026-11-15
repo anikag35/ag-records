@@ -25,7 +25,7 @@ Astro, static output. Waveforms are generated at build time from each repo's git
 
 ## Workflow
 
-- Before calling any UI task done, take screenshots at desktop and mobile widths, critique them against this file, and fix what's off.
+- Before calling any UI task done, take Playwright screenshots at desktop and mobile widths, critique them against this file, and fix what's off.
 - Run `npm run check:dashes` before finishing any task. It must pass.
 - Commit at each meaningful boundary with a clear message.
 
@@ -44,6 +44,7 @@ export PATH="$HOME/.nvm/versions/node/v22.23.5/bin:$PATH"
 | `npm run build` | Static output to `dist/`. |
 | `npm run commits` | Regenerates `src/data/commits.json` from GitHub. Needs `gh` auth. |
 | `npm run check:dashes` | Fails if any em or en dash is in `src` or `public`. |
+| `npm run shots -- /path` | Playwright screenshots at 1440 and 390 wide into `.shots/`. Needs the dev server running. |
 
 ## Structure
 
