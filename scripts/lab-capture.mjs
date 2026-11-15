@@ -53,6 +53,15 @@ const audit = () => {
     wrapped: rows.filter((row) => row.scrollWidth > row.clientWidth + 1).length,
     tallRows: lineHeights.filter((h) => h > Math.min(...lineHeights) * 1.4).length,
     sentences: (panel.querySelector(".brief")?.textContent ?? "").split(/(?<=\.)\s+/).filter(Boolean).length,
+    width: wc.dataset.width,
+    facts: panel.querySelector(".facts")?.textContent?.replace(/\s+/g, " ").trim() ?? null,
+    squeeze: (() => {
+      const data = wc.getContext("2d").getImageData(0, 0, wc.width, wc.height).data;
+      let top = wc.height;
+      for (let y = 0; y < wc.height && top === wc.height; y++)
+        for (let x = 0; x < wc.width; x += 7) if (data[(y * wc.width + x) * 4 + 3] > 60) { top = y; break; }
+      return Math.round(((wc.height - top) / wc.height) * 100);
+    })(),
   };
 };
 
@@ -86,7 +95,7 @@ for (const size of SIZES) {
 
   const home = await page.evaluate(audit);
   check(size.name, "home", home, pinned);
-  note(size.name, `home: word box ${home.wordBox.join("/")} , scrollY ${await page.evaluate(() => scrollY)}`);
+  note(size.name, `home (AG RECORDS): letter width ${home.width}x natural, word ${home.squeeze}% of box height`);
   await page.screenshot({ path: `${OUT}/fix-${size.name}-home.png` });
 
   const tabs = await page.locator('[data-turntable] [role="tab"]').count();
@@ -95,6 +104,7 @@ for (const size of SIZES) {
     await page.waitForTimeout(1500);
     const state = await page.evaluate(audit);
     check(size.name, state.selected, state, pinned);
+    note(size.name, `${state.selected}: letter width ${state.width}x natural, word ${state.squeeze}% of box height`);
     if (i === 1) {
       if (pinned) await page.screenshot({ path: `${OUT}/fix-${size.name}-tripwire.png` });
       else {

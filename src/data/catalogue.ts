@@ -72,7 +72,7 @@ export const releases: Release[] = [
     blurb:
       "A drop-in proxy that sits between an AI agent and its tools, and refuses the actions it was tricked into taking.",
     brief:
-      "Anything an agent reads can carry instructions aimed at the agent. tripwire watches the gap between what the user asked for and what the agent is about to do. Built in two days at CalHacks.",
+      "Anything an agent reads can carry instructions aimed at the agent. tripwire watches the gap between what the user asked for and what the agent is about to do. Built with teammates in two days at CalHacks.",
     notes: [
       "Agents that can use tools can be talked into using them badly. A web page, an email, or a file an agent reads can carry instructions aimed at the agent rather than the user, and from the model's side, retrieved text and genuine instructions look alike.",
       "tripwire sits in front of the Model Context Protocol as a proxy, so it needs no change to the agent or the tools. It watches the gap between what the user asked for and what the agent is about to do, and blocks actions that only make sense if something in the content was giving orders.",

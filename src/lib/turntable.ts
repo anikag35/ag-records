@@ -515,8 +515,12 @@ export function mount(root: HTMLElement): void {
     const inkW = m.actualBoundingBoxLeft + m.actualBoundingBoxRight;
     const inkH = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
     if (inkW < 1 || inkH < 1) return;
+    const natural = (W / inkW) * inkH;
+    const tall = Math.min(H, natural / 0.85);
+    word.dataset.width = (natural / tall).toFixed(2);
     g.save();
-    g.scale(W / inkW, H / inkH);
+    g.translate(0, H - tall);
+    g.scale(W / inkW, tall / inkH);
     g.fillStyle = colors.ink;
     g.textBaseline = "alphabetic";
     g.fillText(text, m.actualBoundingBoxLeft, m.actualBoundingBoxAscent);

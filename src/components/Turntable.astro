@@ -141,6 +141,12 @@ while (cursor < 116) {
               hidden
             >
               <h2 class="sr">{release.title}</h2>
+              <p class="facts">
+                <span>{release.stack.join(" · ")}</span>
+                {waveformFor(release.repo) && (
+                  <span>{waveformFor(release.repo)?.commits} commits</span>
+                )}
+              </p>
               <p class="lead">{release.blurb}</p>
               <p class="brief">{release.brief}</p>
               {release.clip && (
@@ -522,6 +528,24 @@ while (cursor < 116) {
     letter-spacing: -0.03em;
     line-height: 0.95;
     margin-bottom: clamp(0.5rem, 1.4vh, 0.9rem);
+  }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 1.1em;
+    margin-bottom: clamp(0.4rem, 1.1vh, 0.75rem);
+    font-family: var(--font-caps);
+    font-size: clamp(0.56rem, 0.8vw, 0.74rem);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .facts span + span {
+    font-weight: 600;
+    color: var(--text-dim);
   }
 
   .lead {
