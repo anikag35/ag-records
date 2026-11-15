@@ -4,6 +4,8 @@
 
 AG Records is a record label where nothing ships until it's checked. Anika is the mastering engineer: the last stage before release, catching what's wrong while there's still time. That is what her projects do (double-blind catches evaluations that lie, tripwire catches actions an agent was tricked into, cloudscape catches incidents before they become post-mortems). Every project is a release with a catalog number (AG-001, AG-002). Ag is the symbol for silver, so the label is silver. Physical media only: vinyl, labels, liner notes, sleeves. No streaming-app references.
 
+The record is the interface. A turntable fills the first screen, each release is a band on the record cut from its commit history, and the tonearm is the navigation: scroll moves the needle, clicking a band drops it there. A plain tracklist exists only as the fallback for reduced motion and no JavaScript. The turntable is being built on `/lab` and is not on the homepage yet.
+
 ## Stack
 
 Astro, static output. Waveforms are generated at build time from each repo's git history, filtered to Anika's own commits. Project clips are short muted looping .webm/.mp4, not GIFs.

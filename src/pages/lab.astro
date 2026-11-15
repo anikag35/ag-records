@@ -1,0 +1,35 @@
+---
+import Base from "../layouts/Base.astro";
+import Turntable from "../components/Turntable.astro";
+import Sleeve from "../components/Sleeve.astro";
+import Track from "../components/Track.astro";
+import Discography from "../components/Discography.astro";
+import { releases } from "../data/catalogue";
+---
+
+<Base title="Lab: turntable">
+  <Turntable />
+
+  <div class="static-fallback">
+    <Sleeve />
+    <section class="section" id="releases">
+      <div class="shell">
+        <div class="section-head">
+          <h2 class="heading">Releases</h2>
+          <p class="marque">{releases.length} tracks · press a row for the notes</p>
+        </div>
+        <div>
+          {releases.map((release) => <Track release={release} />)}
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <Discography />
+</Base>
+
+<style is:global>
+  html[data-turntable="on"] .static-fallback {
+    display: none;
+  }
+</style>
