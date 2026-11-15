@@ -6,18 +6,18 @@ import { withBase } from "../lib/paths";
 type Props = {
   title?: string;
   description?: string;
-  rootStyle?: string;
+  theme?: string;
 };
 
 const {
   title = `${label.artist}, ${label.tagline}`,
   description = label.standfirst,
-  rootStyle,
+  theme,
 } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en" style={rootStyle}>
+<html lang="en" data-theme={theme}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />

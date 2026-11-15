@@ -66,7 +66,7 @@ const summary = data
   }
 
   .wave rect {
-    fill: var(--silver-dim);
+    fill: var(--text-dim);
     opacity: 0.7;
     transition:
       fill 160ms var(--ease),
@@ -76,11 +76,11 @@ const summary = data
   /* Lights up with the row it belongs to. */
   :global(.track:hover) .wave rect,
   :global(.track[open]) .wave rect {
-    fill: var(--silver);
+    fill: var(--text-soft);
     opacity: 1;
   }
 
   :global(.track[open]) .wave rect {
-    fill: var(--accent);
+    fill: var(--mark);
   }
 </style>

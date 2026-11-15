@@ -4,17 +4,20 @@
 @import "@fontsource/ibm-plex-mono/600.css";
 
 :root {
-  --ink: #111214;
-  --sleeve: #1b1c20;
-  --line: #2b2d33;
-  --foil: #e9ecef;
-  --silver: #b9bec6;
-  --silver-dim: #8b9099;
+  --ground: #111214;
+  --ground-raised: #1b1c20;
+  --hairline: #2b2d33;
+  --text: #e9ecef;
+  --text-soft: #b9bec6;
+  --text-dim: #8b9099;
   --accent: #e8442e;
+  --mark: var(--accent);
+  --grey-mid: #8b9099;
 
   --font-display: "Big Shoulders Display Variable", sans-serif;
   --font-mono: "IBM Plex Mono", monospace;
   --font-body: var(--font-mono);
+  --font-caps: var(--font-mono);
 
   --display-weight: 800;
   --display-stretch: 100%;
@@ -27,7 +30,7 @@
   --ease: cubic-bezier(0.2, 0.7, 0.1, 1);
   --measure: 62ch;
   --gutter: clamp(1.25rem, 5vw, 4rem);
-  --rule: 1px solid var(--line);
+  --rule: 1px solid var(--hairline);
 
   color-scheme: dark;
 }
@@ -45,8 +48,8 @@ html {
 
 body {
   margin: 0;
-  background: var(--ink);
-  color: var(--foil);
+  background: var(--ground);
+  color: var(--text);
   font-family: var(--font-body);
   font-size: var(--body-size);
   line-height: 1.7;
@@ -61,7 +64,7 @@ body::before {
   z-index: 100;
   pointer-events: none;
   opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 img,
@@ -83,11 +86,11 @@ a {
 }
 
 a:hover {
-  color: var(--foil);
+  color: var(--text);
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--mark);
   outline-offset: 3px;
   border-radius: 2px;
 }
@@ -105,12 +108,12 @@ a:hover {
 }
 
 .marque {
-  font-family: var(--font-mono);
+  font-family: var(--font-caps);
   font-size: 0.7rem;
   font-weight: 500;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--silver-dim);
+  color: var(--text-dim);
 }
 
 .heading {
@@ -135,7 +138,7 @@ a:hover {
 
 .prose {
   max-width: var(--measure);
-  color: var(--silver);
+  color: var(--text-soft);
 }
 
 .prose p + p {
@@ -147,8 +150,8 @@ a:hover {
   left: -9999px;
   top: 0;
   z-index: 200;
-  background: var(--foil);
-  color: var(--ink);
+  background: var(--text);
+  color: var(--ground);
   padding: 0.6rem 1rem;
   font-family: var(--font-mono);
   font-size: 0.8rem;
@@ -157,6 +160,44 @@ a:hover {
 .skip:focus {
   left: 0.5rem;
   top: 0.5rem;
+}
+
+html[data-theme="paper"] {
+  --ground: #ececea;
+  --ground-raised: #dcdcda;
+  --hairline: #c4c4c1;
+  --text: #1a1a1a;
+  --text-soft: #3a3a38;
+  --text-dim: #636360;
+  --grey-mid: #9a9a97;
+  --mark: var(--text);
+
+  --font-display: "Climate Crisis", sans-serif;
+  --font-caps: "Montserrat Variable", sans-serif;
+  --font-body: "Bricolage Grotesque Variable", sans-serif;
+
+  --display-weight: 400;
+  --display-transform: uppercase;
+  --display-tracking: 0;
+  --display-leading: 0.9;
+  --display-scale: 0.55;
+  --body-size: 1rem;
+
+  color-scheme: light;
+}
+
+html[data-theme="paper"] body {
+  line-height: 1.55;
+}
+
+html[data-theme="paper"] body::before {
+  opacity: 0.2;
+  mix-blend-mode: multiply;
+}
+
+html[data-theme="paper"] .marque {
+  font-weight: 600;
+  letter-spacing: 0.24em;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -2,6 +2,7 @@ type Band = {
   title: string;
   catalog: string;
   seed: string;
+  when: string;
   bars: number[];
 };
 
@@ -74,18 +75,29 @@ export function mount(root: HTMLElement): void {
   const style = getComputedStyle(document.documentElement);
   const token = (name: string) => style.getPropertyValue(name).trim();
   const colors = {
-    ink: token("--ink"),
-    sleeve: token("--sleeve"),
-    line: token("--line"),
-    foil: token("--foil"),
-    silver: token("--silver"),
-    dim: token("--silver-dim"),
+    paper: token("--ground"),
+    hair: token("--hairline"),
+    ink: token("--text"),
+    soft: token("--text-soft"),
+    dim: token("--text-dim"),
+    mid: token("--grey-mid"),
     accent: token("--accent"),
   };
   const fonts = {
     display: token("--font-display"),
+    caps: token("--font-caps"),
     mono: token("--font-mono"),
-    weight: token("--display-weight") || "800",
+    weight: token("--display-weight") || "400",
+  };
+
+  const word = root.querySelector<HTMLElement>("[data-word]");
+  const wordbox = word?.parentElement ?? null;
+  const catalogs = Array.from(root.querySelectorAll<HTMLElement>("[data-catalog]"));
+  const tag = root.querySelector<HTMLElement>("[data-tag]");
+  const home = {
+    word: root.dataset.homeWord ?? "",
+    catalog: root.dataset.homeCatalog ?? "",
+    tag: root.dataset.homeTag ?? "",
   };
 
   const wide = window.matchMedia("(min-width: 56.01rem)");
@@ -141,7 +153,7 @@ export function mount(root: HTMLElement): void {
     const w = Math.max(1, rect.width);
     const h = Math.max(1, rect.height);
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const R = Math.min(h * 0.46, w / 2.36);
+    const R = Math.min(h * 0.44, w / 2.36);
     const cx = (w - 2.3 * R) / 2 + R;
     const cy = h / 2;
     return { w, h, dpr, R, cx, cy, px: cx + 1.06 * R, py: cy - 0.62 * R, arm: R };
@@ -149,7 +161,7 @@ export function mount(root: HTMLElement): void {
 
   function grooves(g: CanvasRenderingContext2D, Rd: number, dpr: number, lit: boolean): void {
     g.lineWidth = dpr * (lit ? 1 : 0.9);
-    g.strokeStyle = lit ? colors.foil : colors.silver;
+    g.strokeStyle = lit ? colors.paper : colors.mid;
     for (let i = 0; i < count; i++) {
       const outer = outerOf(i) * Rd;
       const inner = innerOf(i) * Rd;
@@ -164,7 +176,7 @@ export function mount(root: HTMLElement): void {
         const p1 = random() * Math.PI * 2;
         const p2 = random() * Math.PI * 2;
         const steps = Math.max(120, Math.floor((Math.PI * 2 * r0) / (2.5 * dpr)));
-        g.globalAlpha = lit ? 0.34 + 0.5 * level : 0.17 + 0.3 * level;
+        g.globalAlpha = lit ? 0.5 + 0.45 * level : 0.2 + 0.32 * level;
         g.beginPath();
         for (let k = 0; k <= steps; k++) {
           const a = (k / steps) * Math.PI * 2;
@@ -184,7 +196,7 @@ export function mount(root: HTMLElement): void {
   function ring(g: CanvasRenderingContext2D, r: number, alpha: number, dpr: number): void {
     g.globalAlpha = alpha;
     g.lineWidth = dpr;
-    g.strokeStyle = colors.silver;
+    g.strokeStyle = colors.mid;
     g.beginPath();
     g.arc(0, 0, r, 0, Math.PI * 2);
     g.stroke();
@@ -198,7 +210,7 @@ export function mount(root: HTMLElement): void {
     size: number,
     start: number,
   ): void {
-    g.font = `500 ${size}px ${fonts.mono}`;
+    g.font = `600 ${size}px ${fonts.caps}`;
     g.textAlign = "center";
     g.textBaseline = "middle";
     let a = start;
@@ -228,9 +240,9 @@ export function mount(root: HTMLElement): void {
     const d = disc.getContext("2d")!;
     d.translate(size / 2, size / 2);
     const body = d.createRadialGradient(-Rd * 0.36, -Rd * 0.44, 0, 0, 0, Rd * 1.4);
-    body.addColorStop(0, "#25272d");
-    body.addColorStop(0.5, "#0b0c0e");
-    body.addColorStop(1, "#08090a");
+    body.addColorStop(0, "#2b2b2a");
+    body.addColorStop(0.5, "#141414");
+    body.addColorStop(1, "#0c0c0c");
     d.fillStyle = body;
     d.beginPath();
     d.arc(0, 0, Rd, 0, Math.PI * 2);
@@ -241,8 +253,8 @@ export function mount(root: HTMLElement): void {
     ring(d, Rd * 0.385, 0.08, dpr);
     ring(d, Rd * 0.372, 0.05, dpr);
     grooves(d, Rd, dpr, false);
-    d.fillStyle = colors.dim;
-    d.globalAlpha = 0.5;
+    d.fillStyle = colors.mid;
+    d.globalAlpha = 0.6;
     arcText(d, "AG RECORDS  MASTERED BY A GIRI  SIDE A", Rd * 0.352, Rd * 0.014, -0.9);
     d.globalAlpha = 1;
 
@@ -257,21 +269,26 @@ export function mount(root: HTMLElement): void {
     under.height = canvas!.height;
     const u = under.getContext("2d")!;
     u.scale(dpr, dpr);
-    u.fillStyle = colors.sleeve;
-    u.fillRect(0, 0, w, h);
-    u.strokeStyle = colors.line;
-    u.lineWidth = 1;
-    u.strokeRect(0.5, 0.5, w - 1, h - 1);
-    u.fillStyle = "#14151a";
+    u.save();
+    u.shadowColor = "rgb(0 0 0 / 0.28)";
+    u.shadowBlur = R * 0.16;
+    u.shadowOffsetX = R * 0.02;
+    u.shadowOffsetY = R * 0.06;
+    u.fillStyle = colors.hair;
     u.beginPath();
     u.arc(geo.cx, geo.cy, R * 1.035, 0, Math.PI * 2);
     u.fill();
+    u.restore();
+    u.strokeStyle = colors.mid;
+    u.lineWidth = 1;
+    u.beginPath();
+    u.arc(geo.cx, geo.cy, R * 1.035, 0, Math.PI * 2);
     u.stroke();
     u.save();
-    u.shadowColor = "rgb(0 0 0 / 0.6)";
-    u.shadowBlur = R * 0.07;
-    u.shadowOffsetY = R * 0.025;
-    u.fillStyle = "#08090a";
+    u.shadowColor = "rgb(0 0 0 / 0.5)";
+    u.shadowBlur = R * 0.06;
+    u.shadowOffsetY = R * 0.02;
+    u.fillStyle = "#0c0c0c";
     u.beginPath();
     u.arc(geo.cx, geo.cy, R * 0.99, 0, Math.PI * 2);
     u.fill();
@@ -280,13 +297,13 @@ export function mount(root: HTMLElement): void {
     sheen = null;
     if (typeof ctx!.createConicGradient === "function") {
       sheen = ctx!.createConicGradient(-0.6, 0, 0);
-      sheen.addColorStop(0, "rgb(233 236 239 / 0)");
-      sheen.addColorStop(0.06, "rgb(233 236 239 / 0.09)");
-      sheen.addColorStop(0.14, "rgb(233 236 239 / 0)");
-      sheen.addColorStop(0.5, "rgb(233 236 239 / 0)");
-      sheen.addColorStop(0.56, "rgb(233 236 239 / 0.06)");
-      sheen.addColorStop(0.64, "rgb(233 236 239 / 0)");
-      sheen.addColorStop(1, "rgb(233 236 239 / 0)");
+      sheen.addColorStop(0, "rgb(255 255 255 / 0)");
+      sheen.addColorStop(0.06, "rgb(255 255 255 / 0.16)");
+      sheen.addColorStop(0.14, "rgb(255 255 255 / 0)");
+      sheen.addColorStop(0.5, "rgb(255 255 255 / 0)");
+      sheen.addColorStop(0.56, "rgb(255 255 255 / 0.1)");
+      sheen.addColorStop(0.64, "rgb(255 255 255 / 0)");
+      sheen.addColorStop(1, "rgb(255 255 255 / 0)");
     }
 
     labelFor = -2;
@@ -303,21 +320,14 @@ export function mount(root: HTMLElement): void {
     const g = labelArt.getContext("2d")!;
     g.translate(size / 2, size / 2);
 
-    if (typeof g.createConicGradient === "function") {
-      const metal = g.createConicGradient(0.35, 0, 0);
-      const stops = ["#e9ecef", "#9aa0a8", "#e9ecef", "#b9bec6", "#8b9099", "#dfe3e7", "#a3a8b0", "#e9ecef"];
-      stops.forEach((c, i) => metal.addColorStop(i / (stops.length - 1), c));
-      g.fillStyle = metal;
-    } else {
-      g.fillStyle = colors.silver;
-    }
+    g.fillStyle = colors.paper;
     g.beginPath();
     g.arc(0, 0, lr, 0, Math.PI * 2);
     g.fill();
 
     g.strokeStyle = colors.ink;
-    g.globalAlpha = 0.35;
-    g.lineWidth = geo.dpr;
+    g.globalAlpha = 0.8;
+    g.lineWidth = geo.dpr * 1.25;
     g.beginPath();
     g.arc(0, 0, lr * 0.93, 0, Math.PI * 2);
     g.stroke();
@@ -329,11 +339,13 @@ export function mount(root: HTMLElement): void {
 
     const spaced = g as CanvasRenderingContext2D & { letterSpacing?: string };
     spaced.letterSpacing = `${lr * 0.03}px`;
-    g.font = `600 ${lr * 0.115}px ${fonts.mono}`;
+    g.font = `600 ${lr * 0.1}px ${fonts.caps}`;
     g.fillText("AG RECORDS", lr * 0.015, -lr * 0.5);
 
     spaced.letterSpacing = "0px";
-    g.font = `${fonts.weight} ${lr * 0.34}px ${fonts.display}`;
+    g.font = `${fonts.weight} 100px ${fonts.display}`;
+    const fitted = (100 * lr * 1.5) / Math.max(1, g.measureText("ANIKA GIRI").width);
+    g.font = `${fonts.weight} ${fitted}px ${fonts.display}`;
     g.fillText("ANIKA GIRI", 0, lr * 0.4);
 
     spaced.letterSpacing = `${lr * 0.02}px`;
@@ -358,20 +370,17 @@ export function mount(root: HTMLElement): void {
 
     ctx!.save();
     ctx!.lineCap = "round";
-    ctx!.shadowColor = "rgb(0 0 0 / 0.5)";
-    ctx!.shadowBlur = R * 0.03;
-    ctx!.shadowOffsetX = R * 0.012;
-    ctx!.shadowOffsetY = R * 0.03;
+    ctx!.shadowColor = "rgb(0 0 0 / 0.38)";
+    ctx!.shadowBlur = R * 0.05;
+    ctx!.shadowOffsetX = R * 0.02;
+    ctx!.shadowOffsetY = R * 0.05;
 
-    ctx!.fillStyle = colors.sleeve;
-    ctx!.strokeStyle = colors.line;
-    ctx!.lineWidth = 1;
+    ctx!.fillStyle = colors.soft;
     ctx!.beginPath();
     ctx!.arc(px, py, R * 0.1, 0, Math.PI * 2);
     ctx!.fill();
-    ctx!.stroke();
 
-    ctx!.strokeStyle = colors.dim;
+    ctx!.strokeStyle = colors.soft;
     ctx!.lineWidth = R * 0.07;
     ctx!.lineCap = "butt";
     ctx!.beginPath();
@@ -379,8 +388,8 @@ export function mount(root: HTMLElement): void {
     ctx!.lineTo(px - ux * R * 0.25, py - uy * R * 0.25);
     ctx!.stroke();
 
-    ctx!.strokeStyle = colors.silver;
-    ctx!.lineWidth = R * 0.02;
+    ctx!.strokeStyle = colors.mid;
+    ctx!.lineWidth = R * 0.022;
     ctx!.lineCap = "round";
     ctx!.beginPath();
     ctx!.moveTo(px - ux * R * 0.1, py - uy * R * 0.1);
@@ -389,9 +398,9 @@ export function mount(root: HTMLElement): void {
 
     ctx!.translate(sx, sy);
     ctx!.rotate(phi);
-    ctx!.fillStyle = colors.foil;
+    ctx!.fillStyle = colors.ink;
     ctx!.fillRect(-R * 0.1, -R * 0.026, R * 0.11, R * 0.052);
-    ctx!.strokeStyle = colors.silver;
+    ctx!.strokeStyle = colors.soft;
     ctx!.lineWidth = R * 0.008;
     ctx!.beginPath();
     ctx!.moveTo(-R * 0.03, R * 0.026);
@@ -399,7 +408,7 @@ export function mount(root: HTMLElement): void {
     ctx!.stroke();
     ctx!.restore();
 
-    ctx!.fillStyle = colors.silver;
+    ctx!.fillStyle = colors.hair;
     ctx!.beginPath();
     ctx!.arc(px, py, R * 0.04, 0, Math.PI * 2);
     ctx!.fill();
@@ -414,6 +423,7 @@ export function mount(root: HTMLElement): void {
     if (!geo || !disc || !bright || !labelArt || !under) return;
     const { dpr, R, cx, cy } = geo;
     ctx!.setTransform(1, 0, 0, 1, 0, 0);
+    ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
     ctx!.drawImage(under, 0, 0);
     ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
 
@@ -441,7 +451,7 @@ export function mount(root: HTMLElement): void {
     ctx!.drawImage(labelArt, -lr, -lr, lr * 2, lr * 2);
     ctx!.restore();
 
-    ctx!.fillStyle = "#08090a";
+    ctx!.fillStyle = colors.mid;
     ctx!.beginPath();
     ctx!.arc(0, 0, lr * 0.075, 0, Math.PI * 2);
     ctx!.fill();
@@ -458,7 +468,44 @@ export function mount(root: HTMLElement): void {
     drawArm(geo);
   }
 
+  function fitWord(): void {
+    if (!word || !wordbox) return;
+    const probe = document.createElement("canvas").getContext("2d")!;
+    probe.font = `${fonts.weight} 100px ${fonts.display}`;
+    const m = probe.measureText("H");
+    const cap = m.actualBoundingBoxAscent / 100;
+    const leading = (2 * m.actualBoundingBoxAscent - m.fontBoundingBoxAscent + m.fontBoundingBoxDescent) / 100;
+    const avail = wordbox.clientWidth;
+    const tallest = Math.min(window.innerHeight * 0.155, avail * 0.098);
+    const shortest = tallest * 0.8;
+    word.style.transform = "none";
+    word.style.lineHeight = String(leading);
+    word.style.fontSize = "100px";
+    const natural = word.getBoundingClientRect().width;
+    const height = clamp((100 * avail * cap) / natural, shortest, tallest);
+    const size = height / cap;
+    word.style.fontSize = `${size}px`;
+    word.style.transform = `scaleX(${avail / ((natural * size) / 100)})`;
+    root.style.setProperty("--word-h", `${tallest}px`);
+  }
+
+  function describe(): void {
+    const band = index >= 0 ? bands[index] : null;
+    catalogs.forEach((el) => {
+      el.textContent = band ? band.catalog : home.catalog;
+    });
+    if (tag) tag.textContent = band ? band.when : home.tag;
+    if (word) {
+      word.textContent = band ? band.title : home.word;
+      fitWord();
+      word.classList.remove("swap");
+      void word.offsetWidth;
+      word.classList.add("swap");
+    }
+  }
+
   function reflect(): void {
+    describe();
     const slot = index + 1;
     tabs.forEach((tab, i) => {
       const on = i === slot;
@@ -592,7 +639,10 @@ export function mount(root: HTMLElement): void {
   let pending = 0;
   new ResizeObserver(() => {
     window.clearTimeout(pending);
-    pending = window.setTimeout(prerender, 80);
+    pending = window.setTimeout(() => {
+      fitWord();
+      prerender();
+    }, 80);
   }).observe(deck);
 
   wide.addEventListener("change", () => {
@@ -602,7 +652,7 @@ export function mount(root: HTMLElement): void {
   const faces = document.fonts
     ? Promise.all([
         document.fonts.load(`${fonts.weight} 24px ${fonts.display}`),
-        document.fonts.load(`600 12px ${fonts.mono}`),
+        document.fonts.load(`600 12px ${fonts.caps}`),
         document.fonts.load(`500 12px ${fonts.mono}`),
       ]).catch(() => [])
     : Promise.resolve([]);

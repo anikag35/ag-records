@@ -1,9 +1,13 @@
 ---
+import "@fontsource/climate-crisis";
+import "@fontsource-variable/montserrat";
+import "@fontsource-variable/bricolage-grotesque";
 import { releases, label, waveformFor } from "../data/catalogue";
 import { withBase } from "../lib/paths";
 
 const LEAD = 0.6;
 const SEG = 0.75;
+const HOME_CATALOG = "AG-000";
 
 const catalogOf = (n: number) => `AG-${String(n).padStart(3, "0")}`;
 
@@ -11,10 +15,23 @@ const bands = releases.map((release) => ({
   title: release.title,
   catalog: catalogOf(release.n),
   seed: release.repo,
+  when: release.when,
   bars: waveformFor(release.repo)?.bars ?? [],
 }));
 
 const length = 1 + LEAD + releases.length * SEG;
+
+const bars: { x: number; w: number }[] = [];
+let seed = 20261;
+let cursor = 0;
+while (cursor < 116) {
+  seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+  const w = 1 + (seed % 4);
+  seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+  const gap = 1 + (seed % 3);
+  bars.push({ x: cursor, w });
+  cursor += w + gap;
+}
 ---
 
 <section
@@ -23,27 +40,62 @@ const length = 1 + LEAD + releases.length * SEG;
   data-bands={JSON.stringify(bands)}
   data-lead={LEAD}
   data-seg={SEG}
+  data-home-word={label.name}
+  data-home-catalog={HOME_CATALOG}
+  data-home-tag="2026"
   style={`--tt-length:${length}`}
   hidden
 >
   <div class="stage">
-    <div class="deck">
-      <canvas
-        role="img"
-        aria-label={`Turntable. A record with ${releases.length} bands, one per release. Use the track buttons to move the needle.`}
-      ></canvas>
+    <div class="frame">
+      <p class="corner left">{label.name}</p>
+      <p class="corner right">
+        <span>Side A</span>
+        <span data-catalog>{HOME_CATALOG}</span>
+      </p>
+
+      <div class="deck">
+        <canvas
+          role="img"
+          aria-label={`Turntable. A record with ${releases.length} bands, one per release. Use the tracklist to move the needle.`}
+        ></canvas>
+      </div>
+
+      <div class="sticker" aria-hidden="true">
+        <svg viewBox="0 0 116 34" preserveAspectRatio="none">
+          {bars.map((bar) => <rect x={bar.x} y="0" width={bar.w} height="34" />)}
+        </svg>
+        <span class="code" data-catalog>{HOME_CATALOG}</span>
+      </div>
+
+      <p class="stamp" aria-hidden="true">
+        <span>Mastered at</span>
+        <strong>AG Records</strong>
+        <span>Berkeley CA</span>
+      </p>
+
+      <p class="pricetag" aria-hidden="true">
+        <span>Pressed</span>
+        <strong data-tag>2026</strong>
+      </p>
     </div>
 
-    <div class="side">
-      <div class="tabs" role="tablist" aria-label="Side A">
+    <div class="wordbox" aria-hidden="true">
+      <span class="word" data-word>{label.name}</span>
+    </div>
+
+    <div class="back">
+      <div class="list" role="tablist" aria-label="Side A">
         <button
           role="tab"
           id="tt-tab-sleeve"
           aria-controls="tt-panel-sleeve"
           aria-selected="true"
-          aria-label="Sleeve"
         >
-          Sleeve
+          <span class="no">00</span>
+          <span class="nm">Sleeve</span>
+          <span class="rule"></span>
+          <span class="dur">Front</span>
         </button>
         {
           releases.map((release) => (
@@ -52,10 +104,12 @@ const length = 1 + LEAD + releases.length * SEG;
               id={`tt-tab-${release.n}`}
               aria-controls={`tt-panel-${release.n}`}
               aria-selected="false"
-              aria-label={`A${release.n}, ${release.title}`}
               tabindex="-1"
             >
-              A{release.n}
+              <span class="no">A{release.n}</span>
+              <span class="nm">{release.title}</span>
+              <span class="rule" />
+              <span class="dur">{release.when}</span>
             </button>
           ))
         }
@@ -68,11 +122,10 @@ const length = 1 + LEAD + releases.length * SEG;
           id="tt-panel-sleeve"
           aria-labelledby="tt-tab-sleeve"
         >
-          <p class="marque">{label.name}</p>
           <h1 class="name">{label.artist}</h1>
-          <p class="credit">{label.tagline}</p>
+          <p class="facts">{label.tagline}</p>
           <p class="lead">{label.standfirst}</p>
-          <p class="marque hint">
+          <p class="facts hint">
             <span class="wide-only">Scroll to drop the needle</span>
             <span class="narrow-only">Tap a band to drop the needle</span>
           </p>
@@ -89,14 +142,11 @@ const length = 1 + LEAD + releases.length * SEG;
                 aria-labelledby={`tt-tab-${release.n}`}
                 hidden
               >
-                <p class="marque meta">
-                  <span class="cat">{catalogOf(release.n)}</span>
+                <h2 class="sr">{release.title}</h2>
+                <p class="facts">
+                  <span>{catalogOf(release.n)}</span>
                   {release.tag && <span>{release.tag}</span>}
-                </p>
-                <h2 class="title">{release.title}</h2>
-                <p class="marque facts">
                   <span>{release.stack.join(" · ")}</span>
-                  <span>{release.when}</span>
                   {wave && (
                     <span>
                       {wave.commits} commits, {wave.days}{" "}
@@ -138,6 +188,13 @@ const length = 1 + LEAD + releases.length * SEG;
       </div>
     </div>
   </div>
+
+  <svg class="defs" width="0" height="0" aria-hidden="true">
+    <filter id="tt-rough" x="-2%" y="-10%" width="104%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="2" seed="7" result="n"></feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="1.6"></feDisplacementMap>
+    </filter>
+  </svg>
 </section>
 
 <script>
@@ -155,6 +212,11 @@ const length = 1 + LEAD + releases.length * SEG;
 
 <style>
   .tt {
+    --word-h: 17svh;
+    --pad: clamp(0.75rem, 1.6vw, 1.5rem);
+    --speck: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.3' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0.925 0 0 0 0 0.925 0 0 0 0 0.918 9 0 0 0 -6.2'/%3E%3C/filter%3E%3Crect width='320' height='320' filter='url(%23s)'/%3E%3C/svg%3E");
+    --wear: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='400'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.04' numOctaves='3' seed='11'/%3E%3CfeColorMatrix values='0 0 0 0 0.925 0 0 0 0 0.925 0 0 0 0 0.918 1.1 0 0 0 -0.66'/%3E%3C/filter%3E%3Crect width='900' height='400' filter='url(%23w)'/%3E%3C/svg%3E");
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' seed='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23g)'/%3E%3C/svg%3E");
     height: calc(100svh * var(--tt-length));
   }
 
@@ -162,14 +224,70 @@ const length = 1 + LEAD + releases.length * SEG;
     position: sticky;
     top: 0;
     height: 100svh;
-    display: grid;
-    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    display: flex;
+    flex-direction: column;
+    padding: calc(var(--pad) + env(safe-area-inset-top, 0px)) var(--pad) 0;
     overflow: hidden;
   }
 
-  .deck {
+  .frame {
     position: relative;
-    min-width: 0;
+    flex: 1;
+    min-height: 0;
+    border: 2px solid var(--text);
+    border-radius: clamp(16px, 2vw, 28px);
+    background: var(--ground-raised);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .frame::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background-image: var(--grain);
+    mix-blend-mode: multiply;
+    opacity: 0.32;
+    box-shadow: inset 0 0 70px 26px rgb(255 255 255 / 0.5);
+    border-radius: inherit;
+  }
+
+  .corner {
+    position: absolute;
+    top: clamp(0.9rem, 1.6vw, 1.4rem);
+    z-index: 3;
+    margin: 0;
+    display: flex;
+    gap: 1.25em;
+    font-family: var(--font-caps);
+    font-size: clamp(0.62rem, 0.9vw, 0.8rem);
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .corner.left {
+    left: clamp(1rem, 2vw, 1.75rem);
+  }
+
+  .corner.right {
+    right: clamp(1rem, 2vw, 1.75rem);
+  }
+
+  .deck {
+    position: absolute;
+    top: clamp(2.6rem, 4vw, 3.4rem);
+    left: clamp(0.5rem, 1.2vw, 1.25rem);
+    width: calc(58% - clamp(0.5rem, 1.2vw, 1.25rem));
+    height: calc(100% - clamp(2.6rem, 4vw, 3.4rem) - var(--word-h) * 0.36 - 0.5rem);
+    background: radial-gradient(
+      ellipse 62% 62% at 46% 50%,
+      rgb(255 255 255 / 0.4),
+      rgb(255 255 255 / 0) 100%
+    );
   }
 
   canvas {
@@ -180,63 +298,226 @@ const length = 1 + LEAD + releases.length * SEG;
     display: block;
   }
 
-  .side {
-    min-width: 0;
+  .sticker {
+    position: absolute;
+    top: clamp(2.6rem, 4.4vw, 3.6rem);
+    right: clamp(1rem, 2vw, 1.75rem);
+    z-index: 4;
+    width: clamp(6.2rem, 9vw, 8.2rem);
+    padding: 0.5rem 0.55rem 0.3rem;
+    background: #f7f7f5;
+    clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 0 100%);
+    transform: rotate(1.6deg);
+    filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.25));
+  }
+
+  .sticker::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 15px;
+    height: 15px;
+    background: linear-gradient(225deg, #f7f7f5 0 48%, #a9a9a6 50%, #d9d9d6 72%, #efefed 100%);
+  }
+
+  .sticker svg {
+    display: block;
+    width: 100%;
+    height: clamp(1.5rem, 2.4vw, 2.1rem);
+    fill: var(--text);
+  }
+
+  .code {
+    display: block;
+    margin-top: 0.2rem;
+    font-family: var(--font-mono);
+    font-size: clamp(0.55rem, 0.8vw, 0.7rem);
+    letter-spacing: 0.22em;
+    text-align: center;
+    color: var(--text);
+  }
+
+  .stamp {
+    position: absolute;
+    left: clamp(1rem, 2.2vw, 2rem);
+    bottom: calc(var(--word-h) * 0.36 + 1.1rem);
+    z-index: 3;
+    margin: 0;
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.4rem 0.7rem;
+    border: 2px solid var(--text);
+    border-radius: 3px;
+    font-family: var(--font-caps);
+    font-size: clamp(0.5rem, 0.72vw, 0.62rem);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--text);
+    opacity: 0.6;
+    transform: rotate(-7deg);
+    filter: url(#tt-rough);
+  }
+
+  .stamp strong {
+    font-size: 1.45em;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+  }
+
+  .pricetag {
+    position: absolute;
+    left: calc(58% - 4.6rem);
+    bottom: calc(var(--word-h) * 0.36 + 1.4rem);
+    z-index: 4;
+    margin: 0;
+    display: grid;
+    justify-items: center;
+    gap: 0.05rem;
+    padding: 0.35rem 0.6rem 0.4rem;
+    background: #f7f7f5;
+    border-radius: 3px;
+    font-family: var(--font-caps);
+    font-size: 0.5rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    transform: rotate(5deg);
+    filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.25));
+  }
+
+  .pricetag strong {
+    font-family: var(--font-mono);
+    font-size: 1.5em;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    color: var(--text);
+  }
+
+  .wordbox {
+    position: relative;
+    z-index: 5;
+    height: var(--word-h);
+    margin-top: calc(var(--word-h) * -0.36);
+    margin-bottom: clamp(0.5rem, 1.2vh, 0.9rem);
+    pointer-events: none;
+  }
+
+  .word {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    display: inline-block;
+    white-space: nowrap;
+    transform-origin: 0 100%;
+    font-family: var(--font-display);
+    font-weight: 400;
+    text-transform: uppercase;
+    color: transparent;
+    background-color: var(--text);
+    background-image: var(--speck), var(--wear);
+    background-size:
+      320px 320px,
+      900px 400px;
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter: url(#tt-rough);
+  }
+
+  .word.swap {
+    animation: press 320ms var(--ease);
+  }
+
+  @keyframes press {
+    from {
+      opacity: 0;
+      translate: 0 14%;
+    }
+  }
+
+  .back {
+    position: absolute;
+    z-index: 4;
+    top: calc(var(--pad) + clamp(2.8rem, 4.6vw, 3.9rem));
+    right: calc(var(--pad) + clamp(1rem, 2vw, 1.75rem));
+    width: calc((100% - var(--pad) * 2) * 0.42 - clamp(1.5rem, 3vw, 3rem));
+    bottom: calc(var(--word-h) + clamp(1.25rem, 2.6vh, 2rem));
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: clamp(1.25rem, 3vh, 2rem);
-    padding: calc(1.5rem + env(safe-area-inset-top, 0px)) var(--gutter) 1.5rem
-      clamp(1.5rem, 3vw, 2.75rem);
+    gap: clamp(1rem, 2.4vh, 1.75rem);
     overflow: hidden auto;
   }
 
-  .tabs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem;
+  .list {
+    display: grid;
+    padding-right: clamp(7rem, 10.5vw, 9.6rem);
   }
 
-  .tabs button {
+  .list button {
     appearance: none;
     background: none;
-    border: 1px solid var(--line);
-    border-radius: 2px;
-    color: var(--silver-dim);
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    font-weight: 500;
-    letter-spacing: 0.14em;
+    border: 0;
+    padding: 0.28rem 0;
+    min-height: 1.75rem;
+    display: grid;
+    grid-template-columns: 2.1rem auto minmax(0.75rem, 1fr) auto;
+    align-items: baseline;
+    gap: 0.5rem;
+    text-align: left;
+    font-family: var(--font-caps);
+    font-size: clamp(0.62rem, 0.82vw, 0.72rem);
+    font-weight: 600;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    padding: 0.45rem 0.7rem;
-    min-height: 2.25rem;
+    color: var(--text-dim);
     cursor: pointer;
-    transition:
-      color 140ms var(--ease),
-      border-color 140ms var(--ease),
-      background-color 140ms var(--ease);
+    transition: color 140ms var(--ease);
   }
 
-  .tabs button:hover {
-    color: var(--foil);
-    border-color: var(--silver-dim);
+  .list button:hover {
+    color: var(--text);
   }
 
-  .tabs button[aria-selected="true"] {
-    color: var(--ink);
-    background: var(--foil);
-    border-color: var(--foil);
+  .list button[aria-selected="true"] {
+    color: var(--text);
+    font-weight: 800;
+  }
+
+  .list button[aria-selected="true"] .no {
+    background: var(--text);
+    color: var(--ground-raised);
+  }
+
+  .no {
+    justify-self: start;
+    padding: 0.05rem 0.3rem 0.05rem 0.34rem;
+    letter-spacing: 0.08em;
+  }
+
+  .rule {
+    align-self: center;
+    border-bottom: 1.5px dotted currentColor;
+    opacity: 0.55;
+  }
+
+  .dur {
+    font-weight: 600;
+    white-space: nowrap;
   }
 
   .panel {
-    max-width: 34rem;
-    animation: drop 240ms var(--ease);
+    max-width: 36rem;
+    font-family: var(--font-body);
+    animation: drop 260ms var(--ease);
   }
 
   @keyframes drop {
     from {
       opacity: 0;
-      transform: translateY(0.5rem);
+      transform: translateY(0.4rem);
     }
   }
 
@@ -244,59 +525,55 @@ const length = 1 + LEAD + releases.length * SEG;
     margin: 0;
   }
 
-  .name,
-  .title {
-    font-family: var(--font-display);
-    font-weight: var(--display-weight);
-    font-stretch: var(--display-stretch);
-    text-transform: var(--display-transform);
-    letter-spacing: var(--display-tracking);
-    line-height: var(--display-leading);
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   .name {
-    margin-top: 0.75rem;
-    font-size: calc(clamp(3rem, 6.2vw, 5.75rem) * var(--display-scale));
+    font-family: var(--font-body);
+    font-size: clamp(2.2rem, 4.4vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 0.95;
   }
 
-  .title {
-    margin-top: 0.6rem;
-    font-size: calc(clamp(2.5rem, 5vw, 4.5rem) * var(--display-scale));
-  }
-
-  .credit {
-    margin-top: 0.9rem;
-    color: var(--silver);
-    font-size: 1.0625rem;
-    font-weight: 500;
-  }
-
-  .meta,
   .facts {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem 1rem;
+    gap: 0.25rem 1rem;
+    margin-top: 0.5rem;
+    font-family: var(--font-caps);
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
   }
 
-  .cat {
-    color: var(--foil);
-  }
-
-  .facts {
-    margin-top: 0.9rem;
+  .facts span:first-child {
+    color: var(--text);
   }
 
   .lead {
-    margin-top: 1.25rem;
-    color: var(--foil);
-    line-height: 1.6;
+    margin-top: 0.85rem;
+    font-size: clamp(1rem, 1.35vw, 1.25rem);
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--text);
   }
 
   .notes {
-    margin-top: 1rem;
-    color: var(--silver);
-    font-size: 0.8125rem;
-    line-height: 1.65;
+    margin-top: 0.7rem;
+    font-size: clamp(0.8rem, 0.98vw, 0.9rem);
+    line-height: 1.5;
+    color: var(--text-soft);
+    columns: 2;
+    column-gap: 1.25rem;
   }
 
   .notes p {
@@ -304,48 +581,58 @@ const length = 1 + LEAD + releases.length * SEG;
   }
 
   .notes p + p {
-    margin-top: 0.75em;
+    margin-top: 0.6em;
   }
 
   .clip {
-    margin-top: 1.25rem;
+    margin-top: 0.9rem;
     width: 100%;
-    max-height: 30vh;
-    border: 1px solid var(--line);
-    background: #08090a;
+    max-height: 26vh;
+    border: 1.5px solid var(--text);
+    border-radius: 6px;
+    background: var(--text);
   }
 
   .links {
     display: flex;
     flex-wrap: wrap;
     gap: 1.25rem;
-    margin-top: 1.25rem;
+    margin-top: 0.9rem;
     padding: 0;
     list-style: none;
-    font-size: 0.8rem;
+    font-family: var(--font-caps);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
   }
 
   .links a {
-    color: var(--foil);
+    color: var(--text);
     text-decoration: none;
-    border-bottom: 1px solid var(--silver-dim);
-    padding-bottom: 0.1rem;
+    border-bottom: 1.5px solid var(--text);
+    padding-bottom: 0.12rem;
   }
 
   .links a:hover {
-    border-bottom-color: var(--foil);
+    border-bottom-style: dotted;
   }
 
   .hint {
-    margin-top: 1.75rem;
+    margin-top: 1.1rem;
   }
 
   .narrow-only {
     display: none;
   }
 
+  .defs {
+    position: absolute;
+  }
+
   @media (max-width: 56rem) {
     .tt {
+      --word-h: 9vw;
       height: auto;
     }
 
@@ -354,17 +641,56 @@ const length = 1 + LEAD + releases.length * SEG;
       height: auto;
       display: block;
       overflow: visible;
+      padding-bottom: 3rem;
+    }
+
+    .frame {
+      height: 58svh;
+      min-height: 22rem;
     }
 
     .deck {
-      height: 52svh;
-      min-height: 18rem;
+      top: 2.3rem;
+      left: 0.4rem;
+      width: calc(100% - 0.8rem);
+      height: calc(100% - 2.3rem - var(--word-h) * 0.36 - 0.4rem);
     }
 
-    .side {
-      padding: 1.25rem var(--gutter) 3rem;
+    .sticker {
+      top: 2.5rem;
+      width: 5.2rem;
+    }
+
+    .pricetag {
+      left: auto;
+      right: 1rem;
+      bottom: calc(var(--word-h) * 0.36 + 0.9rem);
+    }
+
+    .stamp {
+      bottom: calc(var(--word-h) * 0.36 + 0.8rem);
+    }
+
+    .back {
+      position: static;
+      width: auto;
       overflow: visible;
-      justify-content: flex-start;
+      padding: 0.25rem 0.35rem 0;
+      gap: 1.5rem;
+    }
+
+    .list {
+      padding-right: 0;
+    }
+
+    .list button {
+      min-height: 2.5rem;
+      font-size: 0.72rem;
+    }
+
+    .notes {
+      columns: 1;
+      font-size: 0.9rem;
     }
 
     .wide-only {

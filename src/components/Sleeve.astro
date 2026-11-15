@@ -69,13 +69,13 @@ import { label } from "../data/catalogue";
   }
 
   .label-mark span:first-child {
-    color: var(--silver);
+    color: var(--text-soft);
   }
 
   .cat {
     padding: 0.15rem 0.5rem;
-    border: 1px solid var(--line);
-    color: var(--silver);
+    border: 1px solid var(--hairline);
+    color: var(--text-soft);
   }
 
   .title {
@@ -94,13 +94,13 @@ import { label } from "../data/catalogue";
     margin: clamp(1rem, 3vw, 1.5rem) 0 0;
     font-size: clamp(1.05rem, 2.5vw, 1.5rem);
     font-weight: 500;
-    color: var(--silver);
+    color: var(--text-soft);
   }
 
   .standfirst {
     margin: clamp(1.5rem, 4vw, 2rem) 0 0;
     max-width: 44ch;
-    color: var(--silver);
+    color: var(--text-soft);
     line-height: 1.7;
   }
 
@@ -132,7 +132,7 @@ import { label } from "../data/catalogue";
       radial-gradient(circle at 32% 28%, #25272d 0%, #08090a 70%);
     box-shadow:
       0 1.5rem 3.5rem rgb(0 0 0 / 0.55),
-      inset 0 0 0 1px var(--line);
+      inset 0 0 0 1px var(--hairline);
     animation: spin 24s linear infinite;
   }
 
@@ -182,14 +182,14 @@ import { label } from "../data/catalogue";
     width: 11%;
     aspect-ratio: 1;
     border-radius: 50%;
-    background: var(--ink);
+    background: var(--ground);
   }
 
   .centre-text {
     font-family: var(--font-mono);
     font-size: 0.6rem;
     letter-spacing: 0.18em;
-    color: var(--ink);
+    color: var(--ground);
     transform: translateY(-1.55rem);
   }
 
@@ -212,7 +212,7 @@ import { label } from "../data/catalogue";
   }
 
   .arrow {
-    color: var(--accent);
+    color: var(--mark);
   }
 
   /* The record is the first thing to go when space runs out: it carries no

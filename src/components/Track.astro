@@ -107,27 +107,27 @@ const stat = wave
   }
 
   .row:hover {
-    background: var(--sleeve);
+    background: var(--ground-raised);
   }
 
   /* The whole row is the control, so the focus ring belongs to the row. */
   .row:focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--mark);
     outline-offset: -2px;
   }
 
   .n {
-    color: var(--silver-dim);
+    color: var(--text-dim);
     font-size: 0.8rem;
     transition: color 140ms var(--ease);
   }
 
   .row:hover .n {
-    color: var(--foil);
+    color: var(--text);
   }
 
   .track[open] .n {
-    color: var(--accent);
+    color: var(--mark);
   }
 
   .main {
@@ -149,14 +149,14 @@ const stat = wave
     font-size: 0.62rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--silver);
-    border: 1px solid var(--line);
+    color: var(--text-soft);
+    border: 1px solid var(--hairline);
     padding: 0.1rem 0.4rem;
     border-radius: 2px;
   }
 
   .blurb {
-    color: var(--silver);
+    color: var(--text-soft);
     font-size: 0.875rem;
     line-height: 1.55;
     max-width: 56ch;
@@ -183,7 +183,7 @@ const stat = wave
 
   .stat {
     margin: 0 0 1.1rem;
-    color: var(--silver);
+    color: var(--text-soft);
   }
 
   .links {
@@ -198,14 +198,14 @@ const stat = wave
   }
 
   .links a {
-    color: var(--foil);
+    color: var(--text);
     text-decoration: none;
-    border-bottom: 1px solid var(--silver-dim);
+    border-bottom: 1px solid var(--text-dim);
     padding-bottom: 0.1rem;
   }
 
   .links a:hover {
-    border-bottom-color: var(--foil);
+    border-bottom-color: var(--text);
   }
 
   .clip {
@@ -214,7 +214,7 @@ const stat = wave
 
   .clip video {
     width: 100%;
-    border: 1px solid var(--line);
+    border: 1px solid var(--hairline);
     border-radius: 3px;
     background: #000;
   }
