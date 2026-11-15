@@ -201,10 +201,7 @@ export const linerNotes = {
     { label: "leetcode grind", href: "#" },
     { label: "walking to class", href: "#" },
   ],
-  contact: [
-    { label: "GitHub", href: "https://github.com/anikag35" },
-    { label: "Email", href: "mailto:girianika35@gmail.com" },
-  ],
+  contact: [{ label: "GitHub", href: "https://github.com/anikag35" }],
 };
 
 export type Waveform = {

@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import { label } from "../data/catalogue";
+import { withBase } from "../lib/paths";
 
 type Props = {
   title?: string;
@@ -26,7 +27,9 @@ const {
     <meta property="og:description" content={description} />
     <meta name="twitter:card" content="summary_large_image" />
 
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href={withBase("favicon.svg")} type="image/svg+xml" />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site)} />
     <meta name="theme-color" content="#15120d" />
   </head>
   <body>

@@ -10,6 +10,7 @@
  */
 import Waveform from "./Waveform.astro";
 import { waveformFor, type Release } from "../data/catalogue";
+import { withBase } from "../lib/paths";
 
 type Props = {
   release: Release;
@@ -67,8 +68,8 @@ const stat = wave
           {/* Press play. preload="none" so five clips cost nothing to
               someone who only came to read. */}
           <video
-            src={release.clip}
-            poster={release.poster ?? undefined}
+            src={withBase(release.clip)}
+            poster={release.poster ? withBase(release.poster) : undefined}
             controls
             muted
             loop
