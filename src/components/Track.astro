@@ -9,7 +9,7 @@
  * be behind an interaction.
  */
 import Waveform from "./Waveform.astro";
-import { waveformFor, type Release } from "../data/catalogue";
+import { waveformFor, catchFor, type Release } from "../data/catalogue";
 import { withBase } from "../lib/paths";
 
 type Props = {
@@ -22,6 +22,7 @@ const n = String(release.n).padStart(2, "0");
 // Stated in words as well as drawn. A quiet waveform should read as "ten days
 // of work" rather than as missing data.
 const wave = waveformFor(release.repo);
+const caught = catchFor(release.repo);
 const stat = wave
   ? `${wave.commits} commits · ${wave.days} day${wave.days === 1 ? "" : "s"}`
   : null;
@@ -48,6 +49,13 @@ const stat = wave
     <div class="prose">
       {stat && <p class="marque stat">{stat}</p>}
       {release.notes.map((p) => <p>{p}</p>)}
+      {
+        caught && (
+          <p class="marque caught">
+            QC: {caught.line} <a href={caught.href}>commit {caught.commit}</a>
+          </p>
+        )
+      }
 
       <ul class="links">
         {
@@ -179,6 +187,11 @@ const stat = wave
     gap: clamp(1.5rem, 4vw, 3rem);
     padding: 0.5rem 0 2.5rem 3.5rem;
     align-items: start;
+  }
+
+  .caught {
+    margin: 1.2rem 0 0;
+    color: var(--text);
   }
 
   .stat {

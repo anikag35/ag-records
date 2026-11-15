@@ -7,6 +7,7 @@
  */
 
 import commits from "./commits.json";
+import qc from "./qc.json";
 
 export type Link = {
   label: string;
@@ -224,8 +225,21 @@ export type Waveform = {
   last: string | null;
   days: number;
   peak: number;
+  flaw?: { sha: string; at: number; date: string } | null;
   bars: number[];
 };
+
+export type Catch = {
+  commit: string;
+  line: string;
+  href: string;
+};
+
+export function catchFor(repo: string): Catch | null {
+  const entry = (qc as Record<string, { commit: string; line: string }>)[repo];
+  if (!entry) return null;
+  return { ...entry, href: `https://github.com/anikag35/${repo}/commit/${entry.commit}` };
+}
 
 /** Commit waveform for a repo, or null if it was never fetched. */
 export function waveformFor(repo: string): Waveform | null {

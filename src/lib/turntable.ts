@@ -3,6 +3,7 @@ type Band = {
   catalog: string;
   seed: string;
   when: string;
+  flaw: number | null;
   bars: number[];
 };
 
@@ -108,6 +109,12 @@ export function mount(root: HTMLElement): void {
   const width = (GROOVE_OUT - GROOVE_IN - GAP * (count - 1)) / count;
   const outerOf = (i: number) => GROOVE_OUT - i * (width + GAP);
   const innerOf = (i: number) => outerOf(i) - width;
+  const flawOf = (i: number) => {
+    const at = bands[i]?.flaw;
+    if (at === null || at === undefined) return null;
+    return outerOf(i) - (0.07 + 0.86 * clamp(at, 0, 1)) * width;
+  };
+  const stamps = panels.map((panel) => panel.querySelector<HTMLElement>("[data-qc]"));
 
   let geo: Geometry | null = null;
   let disc: HTMLCanvasElement | null = null;
@@ -127,6 +134,9 @@ export function mount(root: HTMLElement): void {
   let lastScroll = window.scrollY;
   let velocity = 0;
   let visible = false;
+  let stall = 0;
+  let stalls = 0;
+  let caught = false;
   let frame = 0;
   let previous = 0;
 
@@ -197,6 +207,41 @@ export function mount(root: HTMLElement): void {
     g.globalAlpha = 1;
   }
 
+  function flaws(g: CanvasRenderingContext2D, Rd: number, dpr: number, lit: boolean): void {
+    g.strokeStyle = colors.paper;
+    g.fillStyle = colors.paper;
+    g.lineCap = "round";
+    for (let i = 0; i < count; i++) {
+      const at = flawOf(i);
+      if (at === null) continue;
+      const r = at * Rd;
+      const span = width * Rd;
+      const random = rng(hash(`${bands[i].seed}:qc`));
+      const a = random() * Math.PI * 2;
+      const len = Math.max(span * 0.5, 8 * dpr);
+
+      g.globalAlpha = lit ? 0.7 : 0.34;
+      g.lineWidth = dpr * 1.2;
+      g.beginPath();
+      g.arc(0, 0, r, 0, Math.PI * 2);
+      g.stroke();
+
+      g.globalAlpha = lit ? 1 : 0.9;
+      g.lineWidth = dpr * 2.2;
+      const skew = (len * 0.4) / r;
+      g.beginPath();
+      g.moveTo(Math.cos(a) * (r + len / 2), Math.sin(a) * (r + len / 2));
+      g.lineTo(Math.cos(a + skew) * (r - len / 2), Math.sin(a + skew) * (r - len / 2));
+      g.stroke();
+      g.lineWidth = dpr * 1.2;
+      g.beginPath();
+      g.moveTo(Math.cos(a + skew * 2.2) * (r + len * 0.28), Math.sin(a + skew * 2.2) * (r + len * 0.28));
+      g.lineTo(Math.cos(a + skew * 2.9) * (r - len * 0.2), Math.sin(a + skew * 2.9) * (r - len * 0.2));
+      g.stroke();
+    }
+    g.globalAlpha = 1;
+  }
+
   function ring(g: CanvasRenderingContext2D, r: number, alpha: number, dpr: number): void {
     g.globalAlpha = alpha;
     g.lineWidth = dpr;
@@ -257,6 +302,7 @@ export function mount(root: HTMLElement): void {
     ring(d, Rd * 0.385, 0.08, dpr);
     ring(d, Rd * 0.372, 0.05, dpr);
     grooves(d, Rd, dpr, false);
+    flaws(d, Rd, dpr, false);
     d.fillStyle = colors.mid;
     d.globalAlpha = 0.6;
     arcText(d, "AG RECORDS  MASTERED BY A GIRI  SIDE A", Rd * 0.352, Rd * 0.014, -0.9);
@@ -267,6 +313,7 @@ export function mount(root: HTMLElement): void {
     const b = bright.getContext("2d")!;
     b.translate(size / 2, size / 2);
     grooves(b, Rd, dpr, true);
+    flaws(b, Rd, dpr, true);
 
     under = document.createElement("canvas");
     under.width = canvas!.width;
@@ -579,7 +626,13 @@ export function mount(root: HTMLElement): void {
     if (wide.matches) {
       const rect = root.getBoundingClientRect();
       const span = rect.height - window.innerHeight;
-      const p = to < 0 ? 0 : (lead + to * seg + seg * 0.12) / total;
+      let into = 0.12;
+      const at = to >= 0 ? flawOf(to) : null;
+      if (to >= 0 && at !== null) {
+        const next = to < count - 1 ? outerOf(to + 1) : GROOVE_IN;
+        into = clamp((outerOf(to) - at) / (outerOf(to) - next) + 0.06, 0.12, 0.92);
+      }
+      const p = to < 0 ? 0 : (lead + (to + into) * seg) / total;
       window.scrollTo({ top: window.scrollY + rect.top + p * span, behavior: "smooth" });
     } else {
       tapped = to;
@@ -603,15 +656,29 @@ export function mount(root: HTMLElement): void {
       velocity = lerp(velocity, instant, 1 - Math.exp(-dt * 12));
     } else {
       next = tapped;
-      target = tapped < 0 ? REST : outerOf(tapped) - width * 0.18;
+      const at = tapped >= 0 ? flawOf(tapped) : null;
+      target = tapped < 0 ? REST : at !== null ? at - width * 0.06 : outerOf(tapped) - width * 0.18;
       velocity = lerp(velocity, 0, 1 - Math.exp(-dt * 12));
     }
 
+    const before = radius;
     radius = lerp(radius, target, 1 - Math.exp(-dt * 9));
 
+    const flaw = next >= 0 ? flawOf(next) : null;
+    if (flaw !== null && before > flaw && radius <= flaw) {
+      stall = 0.5;
+      stalls += 1;
+      root.dataset.stalls = String(stalls);
+    }
+
     const playing = next >= 0 ? BASE_SPEED : 0;
-    const goal = clamp(playing + velocity * 0.0016, -MAX_SPEED, MAX_SPEED);
-    omega = lerp(omega, goal, 1 - Math.exp(-dt * 1.6));
+    if (stall > 0) {
+      stall -= dt;
+      omega = lerp(omega, 0, 1 - Math.exp(-dt * 14));
+    } else {
+      const goal = clamp(playing + velocity * 0.0016, -MAX_SPEED, MAX_SPEED);
+      omega = lerp(omega, goal, 1 - Math.exp(-dt * 1.6));
+    }
     angle = (angle + omega * dt) % (Math.PI * 2);
 
     if (next !== index) {
@@ -619,6 +686,15 @@ export function mount(root: HTMLElement): void {
       reflect();
     }
     if (labelFor !== index) renderLabel();
+
+    const printed = flaw !== null && radius <= flaw + 0.0005;
+    if (printed !== caught || stamps[index + 1]?.hidden === printed) {
+      caught = printed;
+      stamps.forEach((stamp, i) => {
+        if (stamp) stamp.hidden = !(printed && i === index + 1);
+      });
+      root.dataset.caught = printed ? String(index) : "";
+    }
 
     const moving = Math.abs(omega) > 0.0004 || Math.abs(radius - target) > 0.0003;
     if (moving || stale) {

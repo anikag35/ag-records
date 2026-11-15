@@ -13,7 +13,7 @@
  */
 
 import { execFile } from "node:child_process";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
@@ -40,20 +40,36 @@ const OUT = resolve(
   "../src/data/commits.json",
 );
 
-/** Every commit date for one repo, via the authenticated gh CLI. */
+const QC = JSON.parse(
+  await readFile(resolve(dirname(fileURLToPath(import.meta.url)), "../src/data/qc.json"), "utf8"),
+);
+
 async function commitDates(repo) {
   const { stdout } = await run("gh", [
     "api",
     "--paginate",
     `repos/${AUTHOR}/${repo}/commits?author=${AUTHOR}&per_page=100`,
     "--jq",
-    ".[].commit.author.date",
+    '.[] | "\\(.sha) \\(.commit.author.date)"',
   ]);
   return stdout
     .split("\n")
     .filter(Boolean)
-    .map((d) => new Date(d).getTime())
-    .sort((a, b) => a - b);
+    .map((row) => {
+      const [sha, date] = row.split(" ");
+      return { sha, t: new Date(date).getTime() };
+    })
+    .sort((a, b) => a.t - b.t);
+}
+
+function flawOf(repo, commits) {
+  const want = QC[repo]?.commit;
+  if (!want || commits.length === 0) return null;
+  const hit = commits.find((c) => c.sha.startsWith(want));
+  if (!hit) return null;
+  const start = commits[0].t;
+  const span = Math.max(commits[commits.length - 1].t - start, 1);
+  return { sha: hit.sha.slice(0, 7), at: (hit.t - start) / span, date: isoDay(hit.t) };
 }
 
 /**
@@ -110,7 +126,8 @@ const data = {};
 for (const repo of REPOS) {
   process.stdout.write(`  ${repo} ... `);
   try {
-    const times = await commitDates(repo);
+    const commits = await commitDates(repo);
+    const times = commits.map((c) => c.t);
     const { bars, peak } = waveform(times);
     data[repo] = {
       commits: times.length,
@@ -125,9 +142,14 @@ for (const repo of REPOS) {
           )
         : 0,
       peak,
+      flaw: flawOf(repo, commits),
       bars,
     };
-    console.log(`${times.length} commits`);
+    const flaw = data[repo].flaw;
+    console.log(
+      `${times.length} commits` +
+        (flaw ? `, flaw ${flaw.sha} on ${flaw.date} at ${(flaw.at * 100).toFixed(1)}%` : ""),
+    );
   } catch (error) {
     // A missing or renamed repo should not take the whole refresh down.
     console.log(`SKIPPED (${error.message.split("\n")[0]})`);

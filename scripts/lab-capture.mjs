@@ -22,7 +22,7 @@ const fail = (size, text) => {
 };
 
 const audit = () => {
-  const root = document.querySelector("[data-turntable]");
+  const root = document.querySelector("section[data-turntable]");
   const rect = (el) => el.getBoundingClientRect();
   const hits = (a, b) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
   const word = rect(root.querySelector(".wordbox"));
@@ -54,6 +54,11 @@ const audit = () => {
     tallRows: lineHeights.filter((h) => h > Math.min(...lineHeights) * 1.4).length,
     sentences: (panel.querySelector(".brief")?.textContent ?? "").split(/(?<=\.)\s+/).filter(Boolean).length,
     width: wc.dataset.width,
+    stamp: (() => {
+      const q = panel.querySelector("[data-qc]");
+      return q ? { shown: !q.hidden, text: q.querySelector("strong").textContent.trim() } : null;
+    })(),
+    stalls: Number(root.dataset.stalls || 0),
     facts: panel.querySelector(".facts")?.textContent?.replace(/\s+/g, " ").trim() ?? null,
     squeeze: (() => {
       const data = wc.getContext("2d").getImageData(0, 0, wc.width, wc.height).data;
@@ -73,6 +78,8 @@ function check(size, state, a, pinned) {
   if (pinned && (a.backOverflow || a.panelPastBack)) fail(size, `${state}: panel overflows by ${a.backOverflow || a.panelPastBack}px`);
   if (a.wrapped || a.tallRows) fail(size, `${state}: ${a.wrapped + a.tallRows} tracklist row(s) wrapped`);
   if (a.sentences > 3) fail(size, `${state}: ${a.sentences} sentences in the brief`);
+  if (state !== "home" && !(a.stamp && a.stamp.shown)) fail(size, `${state}: QC stamp not printed after landing past the flaw`);
+  if (state === "home" && a.stamp) fail(size, "home: has a QC stamp");
 }
 
 for (const size of SIZES) {
@@ -104,7 +111,7 @@ for (const size of SIZES) {
     await page.waitForTimeout(1500);
     const state = await page.evaluate(audit);
     check(size.name, state.selected, state, pinned);
-    note(size.name, `${state.selected}: letter width ${state.width}x natural, word ${state.squeeze}% of box height`);
+    note(size.name, `${state.selected}: stamp "${state.stamp?.text}" shown=${state.stamp?.shown}, stalls so far ${state.stalls}`);
     if (i === 1) {
       if (pinned) await page.screenshot({ path: `${OUT}/fix-${size.name}-tripwire.png` });
       else {
@@ -155,6 +162,60 @@ for (const size of SIZES) {
   );
   note("background tab", `after reveal and scroll: ${after}`);
   await context.close();
+}
+
+{
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 900 },
+    reducedMotion: "no-preference",
+    recordVideo: { dir: `${OUT}/video`, size: { width: 1440, height: 900 } },
+  });
+  const page = await context.newPage();
+  await page.goto(`${BASE}${PATH}`, { waitUntil: "networkidle" });
+  await page.evaluate(() => document.fonts.ready);
+  await page.waitForTimeout(900);
+  await page.mouse.move(600, 450);
+  const state = () =>
+    page.evaluate(() => {
+      const root = document.querySelector("section[data-turntable]");
+      const q = root.querySelector(".panel:not([hidden]) [data-qc]");
+      return {
+        selected: root.querySelector('[role="tab"][aria-selected="true"] .nm')?.textContent?.trim(),
+        shown: q ? !q.hidden : false,
+        stalls: Number(root.dataset.stalls || 0),
+      };
+    });
+  const wheel = async (total, steps) => {
+    for (let i = 0; i < steps; i++) {
+      await page.mouse.wheel(0, total / steps);
+      await page.waitForTimeout(34);
+    }
+  };
+  await wheel(560, 40);
+  await page.waitForTimeout(700);
+  const before = await state();
+  note("scrub", `entered ${before.selected}, before the flaw: stamp shown=${before.shown}, stalls=${before.stalls}`);
+  if (before.selected === "tripwire" && before.shown) fail("scrub", "stamp printed before the needle reached the flaw");
+  await wheel(330, 30);
+  await page.waitForTimeout(1300);
+  const after = await state();
+  note("scrub", `past the flaw: stamp shown=${after.shown}, stalls=${after.stalls}`);
+  if (!after.shown) fail("scrub", "stamp did not print on crossing the flaw");
+  if (after.stalls <= before.stalls) fail("scrub", "platter did not stall on crossing the flaw");
+  await wheel(-330, 30);
+  await page.waitForTimeout(1100);
+  const back = await state();
+  note("scrub", `scrubbed back: stamp shown=${back.shown}`);
+  if (back.shown) fail("scrub", "stamp stayed printed after scrubbing back before the flaw");
+  await wheel(330, 30);
+  await page.waitForTimeout(1500);
+  await wheel(900, 60);
+  await page.waitForTimeout(1500);
+  await context.close();
+  const { readdir, rename, rm } = await import("node:fs/promises");
+  const files = await readdir(`${OUT}/video`);
+  if (files[0]) await rename(`${OUT}/video/${files[0]}`, `${OUT}/qc-scrub.webm`);
+  await rm(`${OUT}/video`, { recursive: true, force: true });
 }
 
 await browser.close();

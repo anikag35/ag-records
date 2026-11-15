@@ -1,0 +1,18 @@
+{
+  "tripwire": {
+    "commit": "2980a6c",
+    "line": "Poisoned tool description. Caught."
+  },
+  "double-blind": {
+    "commit": "3847b92",
+    "line": "Verdict named a model, not a position. Fixed."
+  },
+  "algoscope": {
+    "commit": "c11fc5b",
+    "line": "Run forward. Run back. Same start. Tested."
+  },
+  "cloudscape": {
+    "commit": "7560254",
+    "line": "Symptom in. Root cause out. Confidence attached."
+  }
+}
