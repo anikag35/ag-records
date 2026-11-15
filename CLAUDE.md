@@ -22,10 +22,10 @@ Astro, static output. Waveforms are generated at build time from each repo's git
 The target mood is a printed, photographed record sleeve: light grainy paper, one framed photograph, one giant word. The reference is a monochrome album cover with a framed image, tracked caps in the corners, a barcode sticker and an ultra-heavy word across the bottom. Match its energy, never its layout or content.
 
 - Ground: light paper around #ECECEA with grain over the whole page. No dark UI.
-- Monochrome: ink around #1A1A1A, greys in between. The only color is one small vermillion dot (#E8442E), used on the needle and the QC stamp and nowhere else. Focus rings, links and active states are ink.
+- Monochrome base: ink around #1A1A1A, greys in between. Color appears in two places only: the small vermillion dot (#E8442E) on the needle, and one rounded box per release in that release's own spot color (tripwire orange #FF7A45, double-blind blue #6DB6F2, algoscope green #45C486, cloudscape yellow #F6CD4A). Text inside a color box is ink, and each box has a thin ink outline. Focus rings, links and active states are ink.
 - The turntable lives inside a framed panel with rounded corners and a thin ink outline: black vinyl on a pale grey mat, soft grain, a slight glow at the edges, so it reads as photographed, not rendered.
 - One ultra-wide, ultra-heavy word runs edge to edge across the bottom and overlaps the frame's bottom edge. It is the active release name (home state: AG Records), carries a rough ink texture, and is fitted to the full width every time.
-- Printed details, slightly rotated: a barcode sticker with a peeling corner carrying the catalog number, a rubber stamp, a price-tag date.
+- Printed details, slightly rotated: a barcode sticker with a peeling corner carrying the catalog number, and a price-tag date. No rubber stamps: Anika does not like them.
 - The tracklist is printed-looking release names with dotted leaders, not boxed tabs.
 - No empty half of the screen. Release notes are set small beside or under the record, like the back of a sleeve.
 

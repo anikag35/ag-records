@@ -27,6 +27,7 @@ export type Release = {
   /** One line, shown collapsed. Has to carry the project on its own. */
   blurb: string;
   brief: string;
+  color: string;
   /** The expanded liner notes. Each string is a paragraph. */
   notes: string[];
   links: Link[];
@@ -52,7 +53,7 @@ export const label = {
   tagline: "Systems and AI reliability",
   /** The sentence under the title. Two lines at most. */
   standfirst:
-    "I build infrastructure that makes AI systems trustworthy: evaluating them without bias, stopping them being hijacked, letting them act on production safely. Rust and TypeScript, mostly.",
+    "I build infrastructure that makes AI systems trustworthy: evaluating them without bias, stopping them being hijacked, letting them act on production safely. I study computer science at UC Berkeley and do research at the Sky Computing Lab. My first shipped project was a looping app for dancers, and I still care how software feels to use.",
   location: "Berkeley, California",
 };
 
@@ -67,6 +68,7 @@ export const releases: Release[] = [
     n: 1,
     title: "tripwire",
     repo: "tripwire",
+    color: "#ff7a45",
     stack: ["TypeScript", "MCP"],
     when: "Oct 2026",
     tag: "CalHacks 2026",
@@ -87,6 +89,7 @@ export const releases: Release[] = [
     n: 2,
     title: "double-blind",
     repo: "double-blind",
+    color: "#6db6f2",
     stack: ["Rust", "Distributed"],
     when: "Aug to Nov 2026",
     blurb:
@@ -108,6 +111,7 @@ export const releases: Release[] = [
     n: 3,
     title: "algoscope",
     repo: "algoscope",
+    color: "#45c486",
     stack: ["Rust", "ratatui"],
     when: "Nov 2026",
     tag: "on crates.io",
@@ -132,6 +136,7 @@ export const releases: Release[] = [
     n: 4,
     title: "cloudscape",
     repo: "cloudscape",
+    color: "#f6cd4a",
     stack: ["TypeScript", "AWS"],
     when: "Apr 2026",
     blurb:
@@ -155,6 +160,7 @@ export const shelved: Release[] = [
     n: 5,
     title: "gepa-polyglot",
     repo: "gepa-polyglot",
+    color: "#c9a0e8",
     stack: ["Python", "gRPC", "Rust", "TypeScript"],
     when: "Mar to Aug 2026",
     tag: "Sky Computing Lab",
