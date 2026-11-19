@@ -7,7 +7,6 @@ const most = Math.max(...discography.map((credit) => credit.sleeves.length + 1))
 <section class="catalogue" aria-labelledby="catalogue-title">
   <div class="head">
     <h2 id="catalogue-title" class="title">Back catalogue</h2>
-    <p class="sub">Three crates. Flip through each one.</p>
   </div>
 
   <div class="crates" data-crates-row style={`--most:${most}`}>
@@ -220,16 +219,6 @@ const most = Math.max(...discography.map((credit) => credit.sleeves.length + 1))
     line-height: 0.9;
   }
 
-  .sub {
-    margin: 0;
-    font-family: var(--font-caps);
-    font-size: clamp(0.62rem, 0.85vw, 0.78rem);
-    font-weight: 600;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-  }
-
   .crates {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -286,14 +275,14 @@ const most = Math.max(...discography.map((credit) => credit.sleeves.length + 1))
 
   .caps {
     font-family: var(--font-caps);
-    font-size: clamp(0.58rem, 2.7cqi, 0.74rem);
+    font-size: clamp(0.68rem, 3.1cqi, 0.84rem);
     font-weight: 700;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
   }
 
   .cover .caps {
-    color: rgb(236 236 234 / 0.78);
+    color: var(--ground);
   }
 
   .org {
@@ -309,8 +298,9 @@ const most = Math.max(...discography.map((credit) => credit.sleeves.length + 1))
   .sum,
   .body {
     font-family: var(--font-body);
-    font-size: clamp(0.86rem, 4.3cqi, 1.06rem);
-    line-height: 1.48;
+    font-size: clamp(0.98rem, 4.9cqi, 1.2rem);
+    line-height: 1.5;
+    font-weight: 450;
   }
 
   .sum {
@@ -323,7 +313,7 @@ const most = Math.max(...discography.map((credit) => credit.sleeves.length + 1))
 
   .headline {
     font-family: var(--font-body);
-    font-size: clamp(1.35rem, 8.6cqi, 2.25rem);
+    font-size: clamp(1.5rem, 9.2cqi, 2.45rem);
     font-weight: 800;
     letter-spacing: -0.025em;
     line-height: 1.02;
@@ -384,9 +374,9 @@ const most = Math.max(...discography.map((credit) => credit.sleeves.length + 1))
       inset 0 1px 0 rgb(255 255 255 / 0.55),
       0 12px 20px -12px rgb(0 0 0 / 0.55);
     font-family: var(--font-caps);
-    font-size: clamp(0.56rem, 2.5cqi, 0.72rem);
+    font-size: clamp(0.66rem, 2.9cqi, 0.8rem);
     font-weight: 700;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--text);
     transition:
@@ -410,9 +400,9 @@ const most = Math.max(...discography.map((credit) => credit.sleeves.length + 1))
     background: transparent;
     color: var(--text);
     font-family: var(--font-caps);
-    font-size: 0.68rem;
+    font-size: 0.76rem;
     font-weight: 700;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     cursor: pointer;
     transition:
@@ -427,11 +417,11 @@ const most = Math.max(...discography.map((credit) => credit.sleeves.length + 1))
 
   .count {
     font-family: var(--font-caps);
-    font-size: 0.66rem;
+    font-size: 0.76rem;
     font-weight: 700;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--text-dim);
+    color: var(--text);
   }
 
   :global(html[data-crates="on"]) .crates:not(.in) .sleeve {

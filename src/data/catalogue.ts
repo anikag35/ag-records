@@ -61,7 +61,7 @@ export const label = {
   tagline: "Systems and AI reliability",
   /** The sentence under the title. Two lines at most. */
   standfirst:
-    "I build infrastructure that makes AI systems trustworthy: evaluating them without bias, stopping them being hijacked, letting them act on production safely. I study computer science at UC Berkeley and do research at the Sky Computing Lab. My first shipped project was a looping app for dancers, and I still care how software feels to use.",
+    "I build infrastructure that makes AI systems trustworthy: evaluating them without bias, stopping them being hijacked, letting them act on production safely. I study computer science at UC Berkeley and do research at the Sky Computing Lab. What I care about most is reliability and distributed systems: software that stays correct when parts of it fail.",
   location: "Berkeley, California",
 };
 
@@ -218,7 +218,7 @@ export const discography: Credit[] = [
   {
     org: "UC Berkeley Sky Computing Lab",
     short: "Sky Lab",
-    role: "Undergraduate Researcher, part-time",
+    role: "Undergraduate Researcher, part‑time",
     when: "Mar 2026 to present",
     place: "Berkeley, CA",
     summary:

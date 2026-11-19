@@ -11,7 +11,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "commits": "node scripts/fetch-commits.mjs",
-    "check:dashes": "! grep -rnI '[—–]' src public",
+    "check:dashes": "! LC_ALL=en_US.UTF-8 grep -rnI '[—–]' src public",
     "shots": "node scripts/shots.mjs"
   },
   "dependencies": {
