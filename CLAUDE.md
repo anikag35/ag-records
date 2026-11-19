@@ -29,6 +29,8 @@ The target mood is a printed, photographed record sleeve: light grainy paper, on
 - The tracklist is printed-looking release names with dotted leaders, not boxed tabs.
 - The back catalogue is three record-store crates side by side, one per job. Each crate is a stack of sleeves you flip through: the job's cover first, then one sleeve per thing done there. Below 64rem the crates become a horizontal scroll row. Without JavaScript the sleeves render as a plain readable list.
 - Back catalogue copy comes from Anika's resume. Do not add figures that are not on it.
+- A slim sticky header runs across the whole page: Anika's name on the left, GitHub, LinkedIn and email on the right. Email is anika_giri@berkeley.edu, the address already public on her GitHub profile. The turntable pins below the header.
+- There is no Side B. The crates are the back catalogue, so a flipped record holding the same jobs would repeat them.
 - No empty half of the screen. Release notes are set small beside or under the record, like the back of a sleeve.
 
 Type:

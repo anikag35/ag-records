@@ -255,6 +255,12 @@ export const discography: Credit[] = [
   },
 ];
 
+export const contact: Link[] = [
+  { label: "GitHub", href: "https://github.com/anikag35" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/anika-giri/" },
+  { label: "Email", href: "mailto:anika_giri@berkeley.edu" },
+];
+
 export type Waveform = {
   commits: number;
   first: string | null;

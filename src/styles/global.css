@@ -31,6 +31,7 @@
   --measure: 62ch;
   --gutter: clamp(1.25rem, 5vw, 4rem);
   --rule: 1px solid var(--hairline);
+  --header-h: clamp(2.25rem, 5.4vh, 2.9rem);
 
   color-scheme: light;
 }
@@ -73,6 +74,10 @@ video {
   max-width: 100%;
   height: auto;
   display: block;
+}
+
+[id] {
+  scroll-margin-top: calc(var(--header-h) + 1rem);
 }
 
 [hidden] {

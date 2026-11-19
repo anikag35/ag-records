@@ -4,10 +4,12 @@ import Turntable from "../components/Turntable.astro";
 import Sleeve from "../components/Sleeve.astro";
 import Track from "../components/Track.astro";
 import Crates from "../components/Crates.astro";
+import SiteHeader from "../components/SiteHeader.astro";
 import { releases } from "../data/catalogue";
 ---
 
 <Base>
+  <SiteHeader />
   <Turntable />
 
   <div class="static-fallback">

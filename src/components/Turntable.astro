@@ -199,11 +199,11 @@ while (cursor < 116) {
 
   .stage {
     position: sticky;
-    top: 0;
-    height: 100svh;
+    top: var(--header-h);
+    height: calc(100svh - var(--header-h));
     display: flex;
     flex-direction: column;
-    padding: calc(var(--pad) + env(safe-area-inset-top, 0px)) var(--pad) 0;
+    padding: 0 var(--pad);
     overflow: hidden;
   }
 
@@ -613,6 +613,30 @@ while (cursor < 116) {
 
   .defs {
     position: absolute;
+  }
+
+  @media (max-height: 42rem) and (min-aspect-ratio: 1/1) {
+    .back {
+      gap: 0.6rem;
+    }
+
+    .card {
+      padding: 0.6rem 0.8rem;
+    }
+
+    .facts {
+      margin-bottom: 0.3rem;
+    }
+
+    .brief {
+      margin-top: 0.35rem;
+      font-size: 0.78rem;
+      line-height: 1.42;
+    }
+
+    .links {
+      margin-top: 0.5rem;
+    }
   }
 
   @media (max-width: 49.99rem), (max-aspect-ratio: 1/1) {
