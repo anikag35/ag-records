@@ -136,46 +136,32 @@ while (cursor < 116) {
               hidden
             >
               <h2 class="sr">{release.title}</h2>
-              <p class="facts">
-                <span>{release.stack.join(" · ")}</span>
-                {waveformFor(release.repo) && (
-                  <span>{waveformFor(release.repo)?.commits} commits</span>
+              <div class="card" style={`--spot:${release.color}`}>
+                <p class="facts">{release.stack.join(" · ")}</p>
+                <p class="lead">{release.blurb}</p>
+                <p class="brief">{release.brief}</p>
+                {release.clip && (
+                  <video
+                    class="clip"
+                    src={withBase(release.clip)}
+                    poster={release.poster ? withBase(release.poster) : undefined}
+                    controls
+                    muted
+                    loop
+                    playsinline
+                    preload="none"
+                  />
                 )}
-              </p>
-              <p class="lead">{release.blurb}</p>
-              <p class="brief">{release.brief}</p>
-              {release.clip && (
-                <video
-                  class="clip"
-                  src={withBase(release.clip)}
-                  poster={release.poster ? withBase(release.poster) : undefined}
-                  controls
-                  muted
-                  loop
-                  playsinline
-                  preload="none"
-                />
-              )}
-              <ul class="links">
-                {release.links.map((link) => (
-                  <li>
-                    <a href={link.href} rel="noopener">
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-              {catchFor(release.repo) && (
-                <p class="catch" role="status" data-qc style={`--spot:${release.color}`} hidden>
-                  <span class="catch-head">
-                    <span>{catalogOf(release.n)}</span>
-                    <a href={catchFor(release.repo)?.href} rel="noopener">
-                      commit {catchFor(release.repo)?.commit}
-                    </a>
-                  </span>
-                  <strong>{catchFor(release.repo)?.line}</strong>
-                </p>
-              )}
+                <ul class="links">
+                  {release.links.map((link) => (
+                    <li>
+                      <a href={link.href} rel="noopener">
+                        {link.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </article>
           ))
         }
@@ -521,11 +507,6 @@ while (cursor < 116) {
     color: var(--text);
   }
 
-  .facts span + span {
-    font-weight: 600;
-    color: var(--text-dim);
-  }
-
   .lead {
     font-size: clamp(0.98rem, 1.8vw, 1.8rem);
     font-weight: 700;
@@ -576,43 +557,19 @@ while (cursor < 116) {
     border-bottom-style: dotted;
   }
 
-  .catch {
-    width: fit-content;
-    max-width: 100%;
-    margin-top: clamp(0.55rem, 1.8vh, 1.4rem);
-    padding: 0.5em 0.9em 0.6em;
-    display: grid;
-    gap: 0.2em;
+  .card {
     background: var(--spot);
     border: 1.5px solid var(--text);
-    border-radius: 0.9em;
-    font-family: var(--font-body);
-    font-size: clamp(0.74rem, 1.15vw, 1.1rem);
+    border-radius: clamp(12px, 1.4vw, 18px);
+    padding: clamp(0.75rem, 1.6vw, 1.3rem) clamp(0.85rem, 1.8vw, 1.5rem);
+  }
+
+  :where(.card > *) {
+    margin: 0;
+  }
+
+  .card .brief {
     color: var(--text);
-    animation: drop 260ms var(--ease);
-  }
-
-  .catch strong {
-    font-weight: 700;
-    line-height: 1.25;
-    letter-spacing: -0.005em;
-  }
-
-  .catch-head {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0 1em;
-    font-family: var(--font-caps);
-    font-size: 0.62em;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-  }
-
-  .catch a {
-    color: inherit;
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
   }
 
   .hint {

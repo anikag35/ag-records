@@ -54,10 +54,13 @@ const audit = () => {
     tallRows: lineHeights.filter((h) => h > Math.min(...lineHeights) * 1.4).length,
     sentences: (panel.querySelector(".brief")?.textContent ?? "").split(/(?<=\.)\s+/).filter(Boolean).length,
     width: wc.dataset.width,
-    stamp: (() => {
-      const q = panel.querySelector("[data-qc]");
-      return q ? { shown: !q.hidden, text: q.querySelector("strong").textContent.trim() } : null;
+    card: (() => {
+      const c = panel.querySelector(".card");
+      return c
+        ? { bg: getComputedStyle(c).backgroundColor, text: c.textContent.replace(/\s+/g, " ").trim() }
+        : null;
     })(),
+    qcLeft: document.querySelectorAll("[data-qc], .catch, .caught").length,
     stalls: Number(root.dataset.stalls || 0),
     facts: panel.querySelector(".facts")?.textContent?.replace(/\s+/g, " ").trim() ?? null,
     squeeze: (() => {
@@ -78,8 +81,9 @@ function check(size, state, a, pinned) {
   if (pinned && (a.backOverflow || a.panelPastBack)) fail(size, `${state}: panel overflows by ${a.backOverflow || a.panelPastBack}px`);
   if (a.wrapped || a.tallRows) fail(size, `${state}: ${a.wrapped + a.tallRows} tracklist row(s) wrapped`);
   if (a.sentences > 3) fail(size, `${state}: ${a.sentences} sentences in the brief`);
-  if (state !== "home" && !(a.stamp && a.stamp.shown)) fail(size, `${state}: QC stamp not printed after landing past the flaw`);
-  if (state === "home" && a.stamp) fail(size, "home: has a QC stamp");
+  if (state !== "home" && !a.card) fail(size, `${state}: no color card around the text`);
+  if (a.card && /\d+ commits?/i.test(a.card.text)) fail(size, `${state}: commit count still shown`);
+  if (a.qcLeft) fail(size, `${state}: ${a.qcLeft} QC element(s) still on the page`);
 }
 
 for (const size of SIZES) {
@@ -111,7 +115,7 @@ for (const size of SIZES) {
     await page.waitForTimeout(1500);
     const state = await page.evaluate(audit);
     check(size.name, state.selected, state, pinned);
-    note(size.name, `${state.selected}: stamp "${state.stamp?.text}" shown=${state.stamp?.shown}, stalls so far ${state.stalls}`);
+    note(size.name, `${state.selected}: card ${state.card?.bg}`);
     if (i === 1) {
       if (pinned) await page.screenshot({ path: `${OUT}/fix-${size.name}-tripwire.png` });
       else {
@@ -195,18 +199,15 @@ for (const size of SIZES) {
   await page.waitForTimeout(700);
   const before = await state();
   note("scrub", `entered ${before.selected}, before the flaw: stamp shown=${before.shown}, stalls=${before.stalls}`);
-  if (before.selected === "tripwire" && before.shown) fail("scrub", "stamp printed before the needle reached the flaw");
   await wheel(330, 30);
   await page.waitForTimeout(1300);
   const after = await state();
   note("scrub", `past the flaw: stamp shown=${after.shown}, stalls=${after.stalls}`);
-  if (!after.shown) fail("scrub", "stamp did not print on crossing the flaw");
   if (after.stalls <= before.stalls) fail("scrub", "platter did not stall on crossing the flaw");
   await wheel(-330, 30);
   await page.waitForTimeout(1100);
   const back = await state();
   note("scrub", `scrubbed back: stamp shown=${back.shown}`);
-  if (back.shown) fail("scrub", "stamp stayed printed after scrubbing back before the flaw");
   await wheel(330, 30);
   await page.waitForTimeout(1500);
   await wheel(900, 60);

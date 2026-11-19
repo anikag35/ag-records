@@ -47,15 +47,7 @@ const stat = wave
 
   <div class="notes">
     <div class="prose">
-      {stat && <p class="marque stat">{stat}</p>}
       {release.notes.map((p) => <p>{p}</p>)}
-      {
-        caught && (
-          <p class="marque caught">
-            QC: {caught.line} <a href={caught.href}>commit {caught.commit}</a>
-          </p>
-        )
-      }
 
       <ul class="links">
         {
