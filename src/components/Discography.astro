@@ -20,7 +20,7 @@ import { discography } from "../data/catalogue";
             </div>
 
             <div class="prose body">
-              {credit.notes.map((n) => (
+              {[credit.summary, ...credit.sleeves.map((s) => s.body)].map((n) => (
                 <p>{n}</p>
               ))}
             </div>

@@ -1,0 +1,475 @@
+---
+import { discography } from "../data/catalogue";
+
+const most = Math.max(...discography.map((credit) => credit.sleeves.length + 1));
+---
+
+<section class="catalogue" aria-labelledby="catalogue-title">
+  <div class="head">
+    <h2 id="catalogue-title" class="title">Back catalogue</h2>
+    <p class="sub">Three crates. Flip through each one.</p>
+  </div>
+
+  <div class="crates" data-crates-row style={`--most:${most}`}>
+    {
+      discography.map((credit, i) => {
+        const total = credit.sleeves.length + 1;
+        const fit = Math.min(24, 72 / (credit.short.length * 1.08));
+        return (
+          <section
+            class="crate"
+            data-crate
+            aria-label={credit.org}
+            style={`--crate:${i}; --n:${total}; --org:${fit.toFixed(2)}cqi`}
+          >
+            <div class="box">
+              <ol class="bin">
+                <li class="sleeve cover" data-sleeve style="--pos:0">
+                  <p class="caps">{credit.role}</p>
+                  <h3 class="org">
+                    <span aria-hidden="true">{credit.short}</span>
+                    <span class="sr">{credit.org}</span>
+                  </h3>
+                  <p class="sum">{credit.summary}</p>
+                  <p class="caps meta">
+                    {credit.when} · {credit.place}
+                  </p>
+                </li>
+                {credit.sleeves.map((sleeve, j) => (
+                  <li class="sleeve" data-sleeve style={`--pos:${j + 1}`}>
+                    <p class="caps">
+                      {credit.short} · {j + 2} of {total}
+                    </p>
+                    <h4 class="headline">{sleeve.title}</h4>
+                    <p class="body">{sleeve.body}</p>
+                  </li>
+                ))}
+              </ol>
+              <div class="lip" aria-hidden="true">
+                <span>{credit.short}</span>
+                <span>{total} sleeves</span>
+              </div>
+            </div>
+            <div class="controls">
+              <button type="button" data-prev aria-label={`Previous sleeve, ${credit.org}`}>
+                Back
+              </button>
+              <span class="count" data-count>1 of {total}</span>
+              <button type="button" data-next aria-label={`Next sleeve, ${credit.org}`}>
+                Flip
+              </button>
+            </div>
+            <span class="sr" aria-live="polite" data-live></span>
+          </section>
+        );
+      })
+    }
+  </div>
+</section>
+
+<script>
+  const root = document.documentElement;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const row = document.querySelector<HTMLElement>("[data-crates-row]");
+
+  if (row) {
+    root.dataset.crates = "on";
+
+    const settle = () => {
+      row.classList.add("in");
+      window.setTimeout(() => row.classList.add("settled"), reduce ? 0 : 1600);
+    };
+
+    if (reduce || !("IntersectionObserver" in window)) settle();
+    else {
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            io.disconnect();
+            settle();
+          }
+        },
+        { threshold: 0.12 },
+      );
+      io.observe(row);
+      window.setTimeout(() => {
+        if (!row.classList.contains("in")) {
+          io.disconnect();
+          settle();
+        }
+      }, 8000);
+    }
+
+    const away = "translateY(16%) rotateX(-64deg)";
+
+    for (const crate of row.querySelectorAll<HTMLElement>("[data-crate]")) {
+      const sleeves = Array.from(crate.querySelectorAll<HTMLElement>("[data-sleeve]"));
+      const count = crate.querySelector<HTMLElement>("[data-count]");
+      const live = crate.querySelector<HTMLElement>("[data-live]");
+      const order = sleeves.map((_, i) => i);
+      let busy = false;
+
+      const titleOf = (el: HTMLElement) =>
+        el.querySelector(".headline, .org .sr")?.textContent?.trim() ?? "";
+
+      const layout = () => {
+        order.forEach((index, pos) => {
+          const el = sleeves[index];
+          el.style.setProperty("--pos", String(pos));
+          el.toggleAttribute("data-front", pos === 0);
+        });
+        const front = order[0];
+        if (count) count.textContent = `${front + 1} of ${sleeves.length}`;
+        crate.dataset.front = String(front);
+      };
+
+      const announce = () => {
+        if (live) live.textContent = `${titleOf(sleeves[order[0]])}, ${order[0] + 1} of ${sleeves.length}`;
+      };
+
+      const jump = (el: HTMLElement) => {
+        el.style.transition = "none";
+        layout();
+        el.getBoundingClientRect();
+        el.style.transition = "";
+      };
+
+      const flip = async (dir: number) => {
+        if (busy || sleeves.length < 2) return;
+        busy = true;
+        if (dir > 0) {
+          const front = sleeves[order[0]];
+          front.style.transformOrigin = "50% 100%";
+          if (!reduce) {
+            await front.animate(
+              [
+                { transform: getComputedStyle(front).transform, opacity: 1 },
+                { transform: away, opacity: 0 },
+              ],
+              { duration: 260, easing: "cubic-bezier(0.4, 0, 0.8, 0.6)" },
+            ).finished;
+          }
+          order.push(order.shift()!);
+          front.style.transformOrigin = "";
+          jump(front);
+          if (!reduce) front.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240 });
+        } else {
+          order.unshift(order.pop()!);
+          const back = sleeves[order[0]];
+          jump(back);
+          back.style.transformOrigin = "50% 100%";
+          if (!reduce) {
+            await back.animate(
+              [
+                { transform: away, opacity: 0 },
+                { transform: "none", opacity: 1 },
+              ],
+              { duration: 340, easing: "cubic-bezier(0.2, 0.7, 0.1, 1)" },
+            ).finished;
+          }
+          back.style.transformOrigin = "";
+        }
+        announce();
+        busy = false;
+      };
+
+      crate.querySelector("[data-next]")?.addEventListener("click", () => flip(1));
+      crate.querySelector("[data-prev]")?.addEventListener("click", () => flip(-1));
+      crate.addEventListener("click", (event) => {
+        const sleeve = (event.target as HTMLElement).closest("[data-sleeve]");
+        if (sleeve?.hasAttribute("data-front")) flip(1);
+      });
+      crate.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowRight") {
+          event.preventDefault();
+          flip(1);
+        } else if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          flip(-1);
+        }
+      });
+
+      layout();
+    }
+  }
+</script>
+
+<style>
+  .catalogue {
+    --peek: clamp(10px, 1.05vw, 15px);
+    --lip: clamp(2.5rem, 4.2vw, 3.4rem);
+    padding: clamp(3rem, 9vh, 6.5rem) clamp(0.75rem, 1.6vw, 1.5rem) clamp(4rem, 11vh, 7.5rem);
+  }
+
+  .head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem 2rem;
+    margin-bottom: clamp(1.75rem, 5vh, 3rem);
+    padding-inline: 0.2rem;
+  }
+
+  .title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: clamp(2.2rem, 6.4vw, 6rem);
+    line-height: 0.9;
+  }
+
+  .sub {
+    margin: 0;
+    font-family: var(--font-caps);
+    font-size: clamp(0.62rem, 0.85vw, 0.78rem);
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .crates {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(0.9rem, 1.6vw, 1.5rem);
+  }
+
+  .crate {
+    position: relative;
+    container-type: inline-size;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .box {
+    position: relative;
+  }
+
+  .bin {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.9rem;
+  }
+
+  .sleeve {
+    margin: 0;
+    min-width: 0;
+    min-height: 92cqi;
+    padding: 7cqi 7cqi 8cqi;
+    display: flex;
+    flex-direction: column;
+    gap: 3.2cqi;
+    border: 1.5px solid var(--text);
+    border-radius: 5px;
+    background: linear-gradient(135deg, rgb(255 255 255 / 0.5), rgb(255 255 255 / 0) 46%), #f4f4f1;
+    color: var(--text);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.7),
+      0 14px 24px -16px rgb(0 0 0 / 0.5);
+  }
+
+  .sleeve.cover {
+    background: linear-gradient(135deg, rgb(255 255 255 / 0.12), rgb(255 255 255 / 0) 46%), var(--text);
+    color: var(--ground);
+  }
+
+  .sleeve > * {
+    margin: 0;
+  }
+
+  .caps {
+    font-family: var(--font-caps);
+    font-size: clamp(0.58rem, 2.7cqi, 0.74rem);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .cover .caps {
+    color: rgb(236 236 234 / 0.78);
+  }
+
+  .org {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: var(--org);
+    line-height: 0.88;
+    letter-spacing: 0;
+  }
+
+  .sum,
+  .body {
+    font-family: var(--font-body);
+    font-size: clamp(0.86rem, 4.3cqi, 1.06rem);
+    line-height: 1.48;
+  }
+
+  .sum {
+    font-weight: 500;
+  }
+
+  .meta {
+    margin-top: auto;
+  }
+
+  .headline {
+    font-family: var(--font-body);
+    font-size: clamp(1.35rem, 8.6cqi, 2.25rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.02;
+  }
+
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .lip,
+  .controls {
+    display: none;
+  }
+
+  :global(html[data-crates="on"]) .bin {
+    gap: 0;
+    padding-top: calc((var(--most) - 1) * var(--peek));
+    perspective: 1200px;
+  }
+
+  :global(html[data-crates="on"]) .sleeve {
+    grid-area: 1 / 1;
+    padding-bottom: calc(var(--lip) + 5cqi);
+    transform-origin: 50% 0;
+    transform: translateY(calc(var(--pos) * var(--peek) * -1)) scale(calc(1 - var(--pos) * 0.045));
+    z-index: calc(20 - var(--pos));
+    filter: brightness(calc(1 - var(--pos) * 0.08));
+    transition:
+      transform 440ms var(--ease),
+      filter 440ms var(--ease),
+      opacity 520ms var(--ease);
+  }
+
+  :global(html[data-crates="on"]) .sleeve[data-front] {
+    cursor: pointer;
+  }
+
+  :global(html[data-crates="on"]) .lip {
+    position: absolute;
+    left: -2%;
+    right: -2%;
+    bottom: 0;
+    z-index: 40;
+    height: var(--lip);
+    padding: 0 5cqi;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1.5px solid var(--text);
+    border-radius: 4px 4px 9px 9px;
+    background: linear-gradient(180deg, #d4d4d1, #c4c4c1);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.55),
+      0 12px 20px -12px rgb(0 0 0 / 0.55);
+    font-family: var(--font-caps);
+    font-size: clamp(0.56rem, 2.5cqi, 0.72rem);
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text);
+    transition:
+      transform 520ms var(--ease),
+      opacity 520ms var(--ease);
+  }
+
+  :global(html[data-crates="on"]) .controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .controls button {
+    appearance: none;
+    min-height: 2.6rem;
+    padding: 0 1.15rem;
+    border: 1.5px solid var(--text);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text);
+    font-family: var(--font-caps);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+      background-color 140ms var(--ease),
+      color 140ms var(--ease);
+  }
+
+  .controls button:hover {
+    background: var(--text);
+    color: var(--ground);
+  }
+
+  .count {
+    font-family: var(--font-caps);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  :global(html[data-crates="on"]) .crates:not(.in) .sleeve {
+    opacity: 0;
+    transform: translateY(42%) scale(0.96);
+  }
+
+  :global(html[data-crates="on"]) .crates:not(.in) .lip {
+    opacity: 0;
+    transform: translateY(35%);
+  }
+
+  :global(html[data-crates="on"]) .crates.in:not(.settled) .sleeve {
+    transition-delay: calc(var(--crate) * 120ms + var(--pos) * 70ms);
+  }
+
+  :global(html[data-crates="on"]) .crates.in:not(.settled) .lip {
+    transition-delay: calc(var(--crate) * 120ms);
+  }
+
+  @media (hover: hover) {
+    :global(html[data-crates="on"]) .crates.settled .crate:hover .sleeve:not([data-front]) {
+      transform: translateY(calc(var(--pos) * var(--peek) * -1.7)) scale(calc(1 - var(--pos) * 0.045));
+    }
+  }
+
+  @media (max-width: 63.99rem) {
+    .crates {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: 0.2rem;
+      padding: 0.2rem 0.2rem 1rem;
+    }
+
+    .crate {
+      flex: 0 0 min(84vw, 23rem);
+      scroll-snap-align: start;
+    }
+  }
+</style>

@@ -39,11 +39,19 @@ export type Release = {
   tag?: string;
 };
 
+export type Sleeve = {
+  title: string;
+  body: string;
+};
+
 export type Credit = {
   org: string;
+  short: string;
   role: string;
   when: string;
-  notes: string[];
+  place: string;
+  summary: string;
+  sleeves: Sleeve[];
 };
 
 export const label = {
@@ -186,26 +194,64 @@ export const shelved: Release[] = [
 export const discography: Credit[] = [
   {
     org: "Amazon Web Services",
-    role: "SDE Intern",
-    when: "Summer 2026",
-    notes: [
-      "Rust backend on Lambda. Redesigned an authorization path from O(n) to O(1), cutting downstream calls by 95%.",
-      "Served 20.5M events a day at 500ms p99.",
+    short: "AWS",
+    role: "Software Development Engineering Intern",
+    when: "May to Aug 2026",
+    place: "Arlington, VA",
+    summary:
+      "A Rust backend on AWS Lambda that lets any resolver group trigger operational runbooks, with no onboarding.",
+    sleeves: [
+      {
+        title: "95% fewer calls",
+        body: "Replaced an O(n) authorization scan with an O(1) DynamoDB lookup, cutting redundant authorization calls by 95%.",
+      },
+      {
+        title: "Run from any ticket",
+        body: "Shipped on-demand runbook execution from any ticket comment. DynamoDB conditional writes keep concurrent requests atomic, and EMF metrics make every run observable.",
+      },
+      {
+        title: "Owned the design",
+        body: "Presented the namespace-aware authorization and identity model in design review, revised it from that feedback, and reviewed code across the service.",
+      },
     ],
   },
   {
-    org: "UC Berkeley · Sky Computing Lab",
-    role: "Researcher",
-    when: "2026 to present",
-    notes: [
-      "Built gepa-polyglot: a gRPC service exposing prompt optimization to TypeScript and Rust with native-language evaluators.",
+    org: "UC Berkeley Sky Computing Lab",
+    short: "Sky Lab",
+    role: "Undergraduate Researcher, part-time",
+    when: "Mar 2026 to present",
+    place: "Berkeley, CA",
+    summary:
+      "Built gepa-polyglot: a gRPC service that turns GEPA's evaluation callback into a network request, so candidates are scored in TypeScript or Rust without porting evaluators to Python.",
+    sleeves: [
+      {
+        title: "One connection per run",
+        body: "A multi-threaded server carries a whole optimization run over one long-lived connection instead of reconnecting per evaluation. A dropped client becomes a terminal error, not a hung run.",
+      },
+      {
+        title: "One function call",
+        body: "TypeScript and Rust SDKs with generated protobuf bindings, connection retries and typed errors. Adopting the service is one call, not a hand-written gRPC client.",
+      },
     ],
   },
   {
     org: "SkedAI",
-    role: "Engineer",
-    when: "2026",
-    notes: ["Constraint-based scheduling with OR-Tools."],
+    short: "SkedAI",
+    role: "Software Engineering Intern",
+    when: "Jan to Apr 2026",
+    place: "Berkeley, CA",
+    summary:
+      "SkedAI is a calendar that replans a student's week from plain-language input.",
+    sleeves: [
+      {
+        title: "Weights, not rules",
+        body: "Extended the constraint model so requests resolve into weighted soft constraints in Google OR-Tools, replacing hand-written rules.",
+      },
+      {
+        title: "Warm starts",
+        body: "Kept full-week replans interactive by starting each solve from the previous schedule instead of from scratch.",
+      },
+    ],
   },
 ];
 

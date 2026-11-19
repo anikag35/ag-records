@@ -27,6 +27,8 @@ The target mood is a printed, photographed record sleeve: light grainy paper, on
 - One ultra-wide, ultra-heavy word runs edge to edge across the bottom and overlaps the frame's bottom edge. It is the active release name (home state: AG Records), carries a rough ink texture, and is fitted to the full width every time.
 - Printed details, slightly rotated: a barcode sticker with a peeling corner carrying the catalog number, and a price-tag date. No rubber stamps: Anika does not like them.
 - The tracklist is printed-looking release names with dotted leaders, not boxed tabs.
+- The back catalogue is three record-store crates side by side, one per job. Each crate is a stack of sleeves you flip through: the job's cover first, then one sleeve per thing done there. Below 64rem the crates become a horizontal scroll row. Without JavaScript the sleeves render as a plain readable list.
+- Back catalogue copy comes from Anika's resume. Do not add figures that are not on it.
 - No empty half of the screen. Release notes are set small beside or under the record, like the back of a sleeve.
 
 Type:
