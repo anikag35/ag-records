@@ -1,32 +1,33 @@
 ---
 import Base from "../layouts/Base.astro";
+import Turntable from "../components/Turntable.astro";
 import Sleeve from "../components/Sleeve.astro";
 import Track from "../components/Track.astro";
-import Discography from "../components/Discography.astro";
+import Crates from "../components/Crates.astro";
 import LinerNotes from "../components/LinerNotes.astro";
 import { releases, label } from "../data/catalogue";
-
-const totalCommits = releases.length;
 ---
 
 <Base>
-  <Sleeve />
+  <Turntable />
 
-  <main>
+  <div class="static-fallback">
+    <Sleeve />
     <section class="section" id="releases">
       <div class="shell">
         <div class="section-head">
           <h2 class="heading">Releases</h2>
-          <p class="marque">{totalCommits} tracks · press a row for the notes</p>
+          <p class="marque">{releases.length} tracks · press a row for the notes</p>
         </div>
-
         <div class="tracklist">
           {releases.map((release) => <Track release={release} />)}
         </div>
       </div>
     </section>
+  </div>
 
-    <Discography />
+  <main>
+    <Crates />
     <LinerNotes />
   </main>
 
@@ -36,7 +37,7 @@ const totalCommits = releases.length;
         {label.name} · {label.catalogue}
       </p>
       <p class="marque">
-        Waveforms are real commit history ·
+        Waveforms are real commit history ·{" "}
         <a href="https://github.com/anikag35/ag-records" rel="noopener">
           source
         </a>
@@ -44,6 +45,12 @@ const totalCommits = releases.length;
     </div>
   </footer>
 </Base>
+
+<style is:global>
+  html[data-turntable="on"] .static-fallback {
+    display: none;
+  }
+</style>
 
 <style>
 

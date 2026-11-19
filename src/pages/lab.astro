@@ -1,35 +1,18 @@
 ---
-import Base from "../layouts/Base.astro";
-import Turntable from "../components/Turntable.astro";
-import Sleeve from "../components/Sleeve.astro";
-import Track from "../components/Track.astro";
-import Crates from "../components/Crates.astro";
-import { releases } from "../data/catalogue";
+import { withBase } from "../lib/paths";
+
+const home = withBase("");
 ---
 
-<Base title="Lab: turntable" theme="paper">
-  <Turntable />
-
-  <div class="static-fallback">
-    <Sleeve />
-    <section class="section" id="releases">
-      <div class="shell">
-        <div class="section-head">
-          <h2 class="heading">Releases</h2>
-          <p class="marque">{releases.length} tracks · press a row for the notes</p>
-        </div>
-        <div>
-          {releases.map((release) => <Track release={release} />)}
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <Crates />
-</Base>
-
-<style is:global>
-  html[data-turntable="on"] .static-fallback {
-    display: none;
-  }
-</style>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content={`0; url=${home}`} />
+    <link rel="canonical" href={home} />
+    <title>AG Records</title>
+  </head>
+  <body>
+    <p><a href={home}>The turntable moved to the homepage.</a></p>
+  </body>
+</html>

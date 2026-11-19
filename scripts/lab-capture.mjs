@@ -3,7 +3,7 @@ import { mkdir } from "node:fs/promises";
 import { chromium } from "playwright";
 
 const BASE = process.env.BASE ?? "http://localhost:4321/ag-records";
-const PATH = process.argv[2] ?? "/lab";
+const PATH = process.argv[2] ?? "/";
 const OUT = ".shots";
 
 const SIZES = [

@@ -56,7 +56,7 @@ export type Credit = {
 
 export const label = {
   name: "AG Records",
-  catalogue: "AG-001",
+  catalogue: "AG-000",
   artist: "Anika Giri",
   tagline: "Systems and AI reliability",
   /** The sentence under the title. Two lines at most. */
