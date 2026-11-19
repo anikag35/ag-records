@@ -77,5 +77,3 @@ export PATH="$HOME/.nvm/versions/node/v22.23.5/bin:$PATH"
 ## Open items
 
 - Clips for tripwire, double-blind, cloudscape (Anika records these)
-- Real playlist links in About (currently #)
-- Email link in Get in touch (held back until Anika approves publishing her address)

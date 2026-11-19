@@ -255,22 +255,6 @@ export const discography: Credit[] = [
   },
 ];
 
-/** The back-of-sleeve credits. */
-export const linerNotes = {
-  firstSingle: {
-    title: "First single",
-    body: "A looping app for dancers, built at hackTJ. Record a phrase, loop it, and keep your hands free while you work the choreography. First thing I shipped that someone else used, and the reason this site is laid out like a record.",
-  },
-  recordedAt: ["Berkeley, CA", "Arlington, VA", "Northern Virginia"],
-  /** TODO: swap in real playlist links. */
-  playlists: [
-    { label: "for writing Rust at 2am", href: "#" },
-    { label: "leetcode grind", href: "#" },
-    { label: "walking to class", href: "#" },
-  ],
-  contact: [{ label: "GitHub", href: "https://github.com/anikag35" }],
-};
-
 export type Waveform = {
   commits: number;
   first: string | null;

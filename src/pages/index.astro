@@ -4,8 +4,7 @@ import Turntable from "../components/Turntable.astro";
 import Sleeve from "../components/Sleeve.astro";
 import Track from "../components/Track.astro";
 import Crates from "../components/Crates.astro";
-import LinerNotes from "../components/LinerNotes.astro";
-import { releases, label } from "../data/catalogue";
+import { releases } from "../data/catalogue";
 ---
 
 <Base>
@@ -28,45 +27,12 @@ import { releases, label } from "../data/catalogue";
 
   <main>
     <Crates />
-    <LinerNotes />
   </main>
 
-  <footer class="section footer">
-    <div class="shell footer-inner">
-      <p class="marque">
-        {label.name} · {label.catalogue}
-      </p>
-      <p class="marque">
-        Waveforms are real commit history ·{" "}
-        <a href="https://github.com/anikag35/ag-records" rel="noopener">
-          source
-        </a>
-      </p>
-    </div>
-  </footer>
 </Base>
 
 <style is:global>
   html[data-turntable="on"] .static-fallback {
     display: none;
-  }
-</style>
-
-<style>
-
-  .footer {
-    padding-block: 2.5rem;
-    padding-bottom: calc(2.5rem + env(safe-area-inset-bottom, 0px));
-  }
-
-  .footer-inner {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .footer a {
-    color: var(--text-soft);
   }
 </style>
